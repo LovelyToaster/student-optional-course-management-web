@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {reactive} from "vue";
 import {ElNotification} from "element-plus";
-import {LoginInter} from "@/types/index.js"
+import {LoginInter} from "@/types"
+import {useRouter} from "vue-router";
 
 let userLoginInfo = reactive<LoginInter>({
   userName: null,
@@ -9,12 +10,13 @@ let userLoginInfo = reactive<LoginInter>({
 })
 let patternName = /^[a-z0-9_-]{3,16}$/
 let patternPassword = /^[a-z0-9_-]{6,18}$/
+let router = useRouter()
 
 // 判断输入是否合法，以及验证登录
 function login() {
   if (patternName.test(userLoginInfo.userName) && userLoginInfo.userName) {
     if (patternPassword.test(userLoginInfo.userPassword) && userLoginInfo.userPassword) {
-      console.log(userLoginInfo.userName, userLoginInfo.userPassword)
+      router.push({name:"home"})
     } else {
       ElNotification({
         title: "错误",
