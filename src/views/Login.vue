@@ -57,7 +57,6 @@ async function login() {
       <div class="button">
         <button @click="login">登录</button>
         <button>忘记密码?</button>
-        <button @click="login()">测试接口</button>
       </div>
     </div>
   </div>
