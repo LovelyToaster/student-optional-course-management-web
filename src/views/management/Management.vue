@@ -35,6 +35,8 @@ let buttonInfo = reactive<ButtonInfoArr>([
 ])
 let viewArray = reactive(["首页"])
 
+router.push({name: "home"})
+
 //获取要访问页面的信息，同时跳转
 function getViews(name: string, index: number, childrenData?: string) {//没有孩子信息的导航栏
   if (childrenData === undefined)
