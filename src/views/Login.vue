@@ -1,37 +1,41 @@
 <script setup lang="ts">
 import {reactive} from "vue";
-import {ElNotification} from "element-plus";
 import {LoginInter} from "@/types"
-import {useRouter} from "vue-router";
+import errorNotification from "@/hooks/notification";
+import {useLoginStore} from "@/store/login";
+import apiInstance from "@/hooks/apiInstance";
+import router from "@/router";
 
 let userLoginInfo = reactive<LoginInter>({
-  userName: null,
-  userPassword: null
+  userName: undefined,
+  userPassword: undefined
 })
 let patternName = /^[a-z0-9_-]{3,16}$/
 let patternPassword = /^[a-z0-9_-]{6,18}$/
-let router = useRouter()
+let loginStore = useLoginStore()
 
 // 判断输入是否合法，以及验证登录
-function login() {
+async function login() {
   if (patternName.test(userLoginInfo.userName) && userLoginInfo.userName) {
     if (patternPassword.test(userLoginInfo.userPassword) && userLoginInfo.userPassword) {
-      router.push({name:"home"})
-    } else {
-      ElNotification({
-        title: "错误",
-        message: "请检查密码格式",
-        type: "error",
-        duration: 3000
+      await apiInstance.get("/user/login", {
+        params: {
+          userName: userLoginInfo.userName,
+          userPassword: userLoginInfo.userPassword
+        }
+      }).then((resp) => {
+        if (resp.data.verify) {
+          loginStore.userName = resp.data.userNames
+          router.push({name: "home", replace: true})
+        } else {
+          errorNotification("用户名或密码错误")
+        }
       })
+    } else {
+      errorNotification("请检查密码格式")
     }
   } else {
-    ElNotification({
-      title: "错误",
-      message: "请检查用户名格式",
-      type: "error",
-      duration: 3000
-    })
+    errorNotification("请检查用户名格式")
   }
 }
 </script>
@@ -53,6 +57,7 @@ function login() {
       <div class="button">
         <button @click="login">登录</button>
         <button>忘记密码?</button>
+        <button @click="login()">测试接口</button>
       </div>
     </div>
   </div>
