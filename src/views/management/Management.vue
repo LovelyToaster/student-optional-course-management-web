@@ -39,16 +39,19 @@ let viewArray = reactive(["首页"])
 function getViews(name: string, index: number, childrenData?: string) {//没有孩子信息的导航栏
   if (childrenData === undefined)
     buttonInfo[index].show = !buttonInfo[index].show
-  if (childrenData === undefined) {
+  if (buttonInfo[index].children === undefined) {
     if (index === 0) {
       viewArray.length = 0
     } else if (viewArray.length != 1) {
       viewArray.length = 1
     }
     viewArray.push(buttonInfo[index].data)
-  } else {
+    router.push({name: name})
+  }
+  if (childrenData != undefined) {
     viewArray.length = 1
     viewArray.push(childrenData)
+    router.push({name: name})
   }
 }
 </script>
