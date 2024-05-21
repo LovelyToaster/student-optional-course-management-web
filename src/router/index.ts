@@ -3,12 +3,16 @@ import Management from "../views/management/Management.vue";
 import Login from "../views/Login.vue";
 import Home from "../views/management/Home.vue";
 import apiInstance from "../hooks/apiInstance";
+import {useLoginStore} from "../store/login";
 
 async function loginStatus() {
+    let loginStore = useLoginStore()
     let loginVerify = undefined
     await apiInstance.get("/user/login/status")
-        .then(() => {
+        .then((resp) => {
             loginVerify = true
+            loginStore.userLoginInfo.userName = resp.data.userName
+            loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
         })
         .catch((e) => {
             if (e.response.status === 301) {

@@ -25,7 +25,8 @@ async function login() {
         }
       }).then((resp) => {
         if (resp.data.verify) {
-          loginStore.userName = resp.data.userNames
+            loginStore.userLoginInfo.userName = resp.data.userName
+            loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
           router.push({name: "home", replace: true})
         } else {
           errorNotification("用户名或密码错误")

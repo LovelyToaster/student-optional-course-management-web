@@ -1,6 +1,7 @@
 export interface LoginInter {
     userName: string,
-    userPassword: string
+    userPassword?: string
+    permissions?: string
 }
 
 interface ButtonInfoInter {
