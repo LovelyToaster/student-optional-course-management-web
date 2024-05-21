@@ -4,10 +4,16 @@ export interface LoginInter {
     permissions?: string
 }
 
-interface ButtonInfoInter {
-    index: number,
+interface ButtonChildrenInfoInter {
     data: string,
     name: string
+}
+
+interface ButtonInfoInter {
+    data: string,
+    name: string,
+    show: boolean,
+    children?: Array<ButtonChildrenInfoInter>
 }
 
 export type ButtonInfoArr = Array<ButtonInfoInter>

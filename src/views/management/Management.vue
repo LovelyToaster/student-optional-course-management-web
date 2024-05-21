@@ -1,22 +1,55 @@
 <script setup lang="ts">
 import {ButtonInfoArr} from "@/types";
 import router from "@/router";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 
-let buttonInfo: ButtonInfoArr = [
+let buttonInfo = reactive<ButtonInfoArr>([
   {
-    index: 1,
     data: "首页",
-    name: "home"
+    name: "home",
+    show: false,
+  },
+  {
+    data: "查看所有信息",
+    name: "info",
+    show: false,
+    children: [
+      {
+        data: "查看教师信息",
+        name: "teacherInfo"
+      },
+      {
+        data: "查看学生信息",
+        name: "studentInfo"
+      },
+      {
+        data: "查看课程信息",
+        name: "courseInfo"
+      },
+      {
+        data: "查看成绩信息",
+        name: "scoreInfo"
+      }
+    ]
   }
-]
-let viewArray = ref(["首页"])
+])
+let viewArray = reactive(["首页"])
 
-function getViews(name: string, index: number) {
-  let viewData = buttonInfo[index - 1].data
-  if (!viewArray.value.includes(viewData))
-    viewArray.value.push(viewData)
-  router.push({name: name})
+//获取要访问页面的信息，同时跳转
+function getViews(name: string, index: number, childrenData?: string) {//没有孩子信息的导航栏
+  if (childrenData === undefined)
+    buttonInfo[index].show = !buttonInfo[index].show
+  if (childrenData === undefined) {
+    if (index === 0) {
+      viewArray.length = 0
+    } else if (viewArray.length != 1) {
+      viewArray.length = 1
+    }
+    viewArray.push(buttonInfo[index].data)
+  } else {
+    viewArray.length = 1
+    viewArray.push(childrenData)
+  }
 }
 </script>
 
@@ -29,10 +62,21 @@ function getViews(name: string, index: number) {
     <div class="sidebar">
       <div class="sidebar-title">功能菜单</div>
       <div class="sidebar-main">
-        <button v-for="button in buttonInfo" :key="button.index" @click="getViews(button.name,button.index)">{{
-            button.data
-          }}
-        </button>
+        <div v-for="(button,index) in buttonInfo" :key="index">
+          <button @click="getViews(button.name,index)">{{
+              button.data
+            }}
+          </button>
+          <Transition name="buttonChildrenList">
+            <ul v-show="button.show">
+              <li v-for="children in button.children" :key="index"
+                  @click="getViews(children.name,index,children.data)">{{
+                  children.data
+                }}
+              </li>
+            </ul>
+          </Transition>
+        </div>
       </div>
     </div>
     <div class="user">
@@ -86,8 +130,11 @@ function getViews(name: string, index: number) {
   font-weight: bold;
 }
 
-.sidebar-main > button {
+.sidebar-main {
   margin-top: 10px;
+}
+
+.sidebar-main button {
   font-size: 20px;
   font-weight: bold;
   width: 100%;
@@ -99,8 +146,35 @@ function getViews(name: string, index: number) {
   transition: background-color .5s;
 }
 
-.sidebar-main > button:hover {
+.sidebar-main button:hover {
   background-color: rgba(100, 149, 237, 0.2);
+}
+
+.sidebar-main li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  transition: background-color .5s;
+  background-color: buttonface;
+}
+
+.sidebar-main li:hover {
+  background-color: rgba(100, 149, 237, 0.2);
+}
+
+/*v-show 过渡动画*/
+
+.buttonChildrenList-enter-active,
+.buttonChildrenList-leave-active {
+  transition: all 0.5s ease;
+}
+
+.buttonChildrenList-enter-from,
+.buttonChildrenList-leave-to {
+  transform: translateY(-20px);
+  height: 0;
+  opacity: 0;
 }
 
 .user {
