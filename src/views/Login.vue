@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {reactive} from "vue";
 import {LoginInter} from "@/types"
-import errorNotification from "@/hooks/notification";
+import {errorNotification} from "@/hooks/notification";
 import {useLoginStore} from "@/store/login";
 import apiInstance from "@/hooks/apiInstance";
 import router from "@/router";

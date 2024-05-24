@@ -1,6 +1,6 @@
 import {ElNotification} from "element-plus";
 
-function errorNotification(message: string) {
+export function errorNotification(message: string) {
     ElNotification({
         title: "错误",
         message: message,
@@ -9,4 +9,11 @@ function errorNotification(message: string) {
     })
 }
 
-export default errorNotification
+export function successNotification(message: string) {
+    ElNotification({
+        title: "成功",
+        message: message,
+        type: "success",
+        duration: 3000
+    })
+}
