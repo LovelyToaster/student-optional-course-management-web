@@ -37,12 +37,12 @@ async function getTeacherInfo() {
 
 function modifyTeacherInfo(index: number) {
   isModify.value = true
-  teacherInfoModifyIndex = index
+  teacherInfoModifyIndex = index + (page.current - 1) * page.info
 }
 
 function deleteTeacherInfo(index: number) {
   isDelete.value = true
-  teacherInfoDeleteIndex = index
+  teacherInfoDeleteIndex = index + (page.current - 1) * page.info
   getTeacherInfo()
 }
 
@@ -178,9 +178,11 @@ onMounted(() => {
       </div>
       <div class="modify-info">
         <span>健康状况：</span>
-        <input type="radio" value="良好" v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
+        <input type="radio" value="良好" name="teacherHealth"
+               v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
                :checked="teacherInfo[teacherInfoModifyIndex].teacherHealth==='良好'">良好
-        <input type="radio" value="较差" v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
+        <input type="radio" value="较差" name="teacherHealth"
+               v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
                :checked="teacherInfo[teacherInfoModifyIndex].teacherHealth==='较差'">较差
       </div>
       <div class="modify-button">
