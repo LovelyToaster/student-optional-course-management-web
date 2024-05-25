@@ -22,7 +22,7 @@ export type ButtonInfoArr = Array<ButtonInfoInter>
 
 //教师信息接口
 export interface TeacherInfoInter {
-    teacherNo: number,
+    teacherNo: string,
     teacherName: string,
     teacherSex: string,
     teacherAge: number,
