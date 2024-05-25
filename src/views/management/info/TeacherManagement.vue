@@ -3,6 +3,7 @@ import {onMounted, reactive, ref} from "vue";
 import {TeacherInfoArr} from "@/types";
 import apiInstance from "@/hooks/apiInstance";
 import {errorNotification, successNotification} from "@/hooks/notification";
+import {Refresh} from "@element-plus/icons-vue";
 
 let manCount = ref(0)
 let womanCount = ref(0)
@@ -10,17 +11,27 @@ let totalCount = ref(0)
 let teacherInfo = reactive<TeacherInfoArr>([])
 let isModify = ref(false)
 let isDelete = ref(false)
+let isRefresh = false
 let teacherInfoModifyIndex = 0
 let teacherInfoDeleteIndex = 0
+let page = reactive({
+  current: undefined,
+  max: undefined,
+  info: 8
+})
 
 
-function getTeacherInfo() {
-  apiInstance.get("/teacher/all")
+async function getTeacherInfo() {
+  await apiInstance.get("/teacher/all")
       .then((resp) => {
         manCount.value = resp.data.manCount
         womanCount.value = resp.data.womanCount
         totalCount.value = resp.data.totalCount
         teacherInfo = resp.data.data
+        page.max = Math.ceil(teacherInfo.length / page.info)
+        if (page.max >= 1)
+          page.current = 1
+        isRefresh = true
       })
 }
 
@@ -63,6 +74,16 @@ function confirmDeleteTeacher() {
       })
 }
 
+async function refreshInfo() {
+  isRefresh = false
+  await getTeacherInfo()
+  if (isRefresh) {
+    successNotification("刷新成功")
+  } else {
+    errorNotification("刷新失败")
+  }
+}
+
 onMounted(() => {
   getTeacherInfo()
 })
@@ -73,33 +94,50 @@ onMounted(() => {
   <div class="main">
     <h1>所有教师的信息</h1>
     <h3>共：{{ totalCount }}人&nbsp;&nbsp;&nbsp;男：{{ manCount }}人&nbsp;&nbsp;&nbsp;女：{{ womanCount }}人</h3>
-    <table class="main-table">
-      <tr>
-        <th>教师编号</th>
-        <th>教师姓名</th>
-        <th>教师性别</th>
-        <th>教师年龄</th>
-        <th>教师学历</th>
-        <th>教师工作</th>
-        <th>毕业院校</th>
-        <th>健康状态</th>
-        <th>管理</th>
-      </tr>
-      <tr v-for="(teacher,index) in teacherInfo" :key="index" class="tr-hover">
-        <td>{{ teacher.teacherNo }}</td>
-        <td>{{ teacher.teacherName }}</td>
-        <td>{{ teacher.teacherSex }}</td>
-        <td>{{ teacher.teacherAge }}</td>
-        <td>{{ teacher.teacherDegree }}</td>
-        <td>{{ teacher.teacherJob }}</td>
-        <td>{{ teacher.teacherGraduateInstitutions }}</td>
-        <td>{{ teacher.teacherHealth }}</td>
-        <td>
-          <button @click="modifyTeacherInfo(index)">修改</button>
-          <button @click="deleteTeacherInfo(index)">删除</button>
-        </td>
-      </tr>
-    </table>
+    <div class="main-info">
+      <table class="main-table">
+        <tr>
+          <th>教师编号</th>
+          <th>教师姓名</th>
+          <th>教师性别</th>
+          <th>教师年龄</th>
+          <th>教师学历</th>
+          <th>教师工作</th>
+          <th>毕业院校</th>
+          <th>健康状态</th>
+          <th>管理</th>
+        </tr>
+        <tr v-for="(teacher,index) in teacherInfo.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
+            class="tr-hover">
+          <td>{{ teacher.teacherNo }}</td>
+          <td>{{ teacher.teacherName }}</td>
+          <td>{{ teacher.teacherSex }}</td>
+          <td>{{ teacher.teacherAge }}</td>
+          <td>{{ teacher.teacherDegree }}</td>
+          <td>{{ teacher.teacherJob }}</td>
+          <td>{{ teacher.teacherGraduateInstitutions }}</td>
+          <td>{{ teacher.teacherHealth }}</td>
+          <td>
+            <button @click="modifyTeacherInfo(index)">修改</button>
+            <button @click="deleteTeacherInfo(index)">删除</button>
+          </td>
+        </tr>
+      </table>
+      <div class="page">
+        <span @click="page.current===1?errorNotification('已经是第一页了'):page.current--"
+              style="cursor: pointer;">上一页
+        </span>
+        <span>
+          {{ page.current }}/{{ page.max }}
+        </span>
+        <span @click="page.current===page.max?errorNotification('已经是最后一页了'):page.current++"
+              style="cursor: pointer;">下一页
+        </span>
+      </div>
+    </div>
+    <el-icon size="40px" class="refresh-icon" @click="refreshInfo">
+      <Refresh/>
+    </el-icon>
   </div>
 
   <!-- 修改界面 -->
@@ -179,9 +217,23 @@ onMounted(() => {
   justify-content: center;
 }
 
+.main-info {
+  width: 75%;
+}
+
+.page {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.page > span {
+  margin: 0 10px;
+  color: cornflowerblue;
+}
+
 .main-table {
   text-align: center;
-  width: 75%;
+  width: 100%;
   margin-top: 10px;
   border: 1px solid black;
 }
@@ -278,5 +330,16 @@ onMounted(() => {
   margin-right: 10px;
   height: 30px;
   width: 50px;
+}
+
+.refresh-icon {
+  margin-top: 10px;
+  transform: rotate(-180deg);
+  transition: 2s;
+}
+
+.refresh-icon:hover {
+  transform: rotate(180deg);
+  transition: 2s;
 }
 </style>
