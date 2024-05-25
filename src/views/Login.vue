@@ -25,8 +25,8 @@ async function login() {
         }
       }).then((resp) => {
         if (resp.data.verify) {
-            loginStore.userLoginInfo.userName = resp.data.userName
-            loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
+          loginStore.userLoginInfo.userName = resp.data.userName
+          loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
           router.push({name: "home", replace: true})
         } else {
           errorNotification("用户名或密码错误")
@@ -53,7 +53,7 @@ async function login() {
       </div>
       <div class="userInfo">
         <span>密&nbsp;&nbsp;&nbsp;码：</span>
-        <input type="text" placeholder="请输入密码" name="userPassword" v-model="userLoginInfo.userPassword">
+        <input type="password" placeholder="请输入密码" name="userPassword" v-model="userLoginInfo.userPassword">
       </div>
       <div class="button">
         <button @click="login">登录</button>
