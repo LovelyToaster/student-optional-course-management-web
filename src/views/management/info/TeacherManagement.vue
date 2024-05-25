@@ -1,25 +1,36 @@
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
-import {TeacherInfoArr} from "@/types";
+import {onMounted, reactive, ref, watch} from "vue";
+import {TeacherInfoArr, TeacherInfoInter} from "@/types";
 import apiInstance from "@/hooks/apiInstance";
 import {errorNotification, successNotification} from "@/hooks/notification";
-import {Refresh} from "@element-plus/icons-vue";
+import {Refresh, Search} from "@element-plus/icons-vue";
 
 let manCount = ref(0)
 let womanCount = ref(0)
 let totalCount = ref(0)
-let teacherInfo = reactive<TeacherInfoArr>([])
+let teacherInfo = ref<TeacherInfoArr>([])
+let teacherSearchInfoStep = {
+  teacherNo: undefined,
+  teacherName: undefined,
+  teacherSex: undefined,
+  teacherAge: undefined,
+  teacherDegree: undefined,
+  teacherJob: undefined,
+  teacherGraduateInstitutions: undefined,
+  teacherHealth: undefined,
+}
+let teacherSearchInfo = reactive<TeacherInfoInter>({...teacherSearchInfoStep})
 let isModify = ref(false)
 let isDelete = ref(false)
+let isSearch = ref(false)
 let isRefresh = false
 let teacherInfoModifyIndex = 0
 let teacherInfoDeleteIndex = 0
 let page = reactive({
-  current: undefined,
-  max: undefined,
+  current: 1,
+  max: 1,
   info: 8
 })
-
 
 async function getTeacherInfo() {
   await apiInstance.get("/teacher/all")
@@ -27,10 +38,7 @@ async function getTeacherInfo() {
         manCount.value = resp.data.manCount
         womanCount.value = resp.data.womanCount
         totalCount.value = resp.data.totalCount
-        teacherInfo = resp.data.data
-        page.max = Math.ceil(teacherInfo.length / page.info)
-        if (page.max >= 1)
-          page.current = 1
+        teacherInfo.value = resp.data.data
         isRefresh = true
       })
 }
@@ -48,7 +56,7 @@ function deleteTeacherInfo(index: number) {
 
 function confirmModifyTeacher() {
   isModify.value = false
-  apiInstance.post("/teacher/modify", teacherInfo[teacherInfoModifyIndex])
+  apiInstance.post("/teacher/modify", teacherInfo.value[teacherInfoModifyIndex])
       .then((resp) => {
         if (resp.data.message) {
           successNotification("信息修改成功!")
@@ -62,7 +70,7 @@ function confirmModifyTeacher() {
 function confirmDeleteTeacher() {
   isDelete.value = false
   apiInstance.post("/teacher/delete", {
-    teacherNo: teacherInfo[teacherInfoDeleteIndex].teacherNo
+    teacherNo: teacherInfo.value[teacherInfoDeleteIndex].teacherNo
   })
       .then((resp) => {
         if (resp.data.message) {
@@ -71,6 +79,24 @@ function confirmDeleteTeacher() {
         } else {
           errorNotification("请检查信息输入是否正确")
         }
+      })
+}
+
+function searchTeacherInfo() {
+  isSearch.value = true
+}
+
+function confirmSearchTeacherInfo() {
+  isSearch.value = false
+  apiInstance.post("/teacher/search", teacherSearchInfo)
+      .then((resp) => {
+        if (resp.data.data) {
+          teacherInfo.value = resp.data.data
+          successNotification("查询成功，共" + resp.data.data.length + "条数据")
+        } else {
+          errorNotification("没有查到数据")
+        }
+        Object.assign(teacherSearchInfo, teacherSearchInfoStep)
       })
 }
 
@@ -83,6 +109,14 @@ async function refreshInfo() {
     errorNotification("刷新失败")
   }
 }
+
+watch(teacherInfo, () => {
+  console.log(teacherInfo.value.length)
+  page.max = Math.ceil(teacherInfo.value.length / page.info)
+  if (page.current > page.max) {
+    page.current = 1
+  }
+})
 
 onMounted(() => {
   getTeacherInfo()
@@ -135,9 +169,14 @@ onMounted(() => {
         </span>
       </div>
     </div>
-    <el-icon size="40px" class="refresh-icon" @click="refreshInfo">
-      <Refresh/>
-    </el-icon>
+    <div style="margin: 10px 0;cursor: pointer;">
+      <el-icon size="40px" style="margin: 0 10px" @click="searchTeacherInfo">
+        <Search/>
+      </el-icon>
+      <el-icon size="40px" class="refresh-icon" @click="refreshInfo" style="margin: 0 10px">
+        <Refresh/>
+      </el-icon>
+    </div>
   </div>
 
   <!-- 修改界面 -->
@@ -209,6 +248,52 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
+  <!-- 查询界面 -->
+  <div>
+    <div class="alert-background" v-if="isSearch" @click="()=>{isSearch=false}"></div>
+    <div v-if="isSearch" class="alert-search">
+      <h2>信息修改</h2>
+      <div class="search-info">
+        <span>教师编号：</span>
+        <input type="text" v-model="teacherSearchInfo.teacherNo">
+      </div>
+      <div class="search-info">
+        <span>教师姓名：</span>
+        <input type="text" v-model="teacherSearchInfo.teacherName">
+      </div>
+      <div class="search-info">
+        <span>教师性别：</span>
+        <input type="radio" name="teacherSex" value="男" v-model="teacherSearchInfo.teacherSex">男
+        <input type="radio" name="teacherSex" value="女" v-model="teacherSearchInfo.teacherSex">女
+      </div>
+      <div class=" search-info">
+        <span>教师年龄：</span>
+        <input type="number" min="18" max="100" v-model="teacherSearchInfo.teacherAge">
+      </div>
+      <div class="search-info">
+        <span>教师学历：</span>
+        <input type="text" v-model="teacherSearchInfo.teacherDegree">
+      </div>
+      <div class="search-info">
+        <span>教师工作：</span>
+        <input type="text" v-model="teacherSearchInfo.teacherJob">
+      </div>
+      <div class="search-info">
+        <span>毕业院校：</span>
+        <input type="text" v-model="teacherSearchInfo.teacherGraduateInstitutions">
+      </div>
+      <div class="search-info">
+        <span>健康状况：</span>
+        <input type="radio" value="良好" name="teacherHealth" v-model="teacherSearchInfo.teacherHealth">良好
+        <input type="radio" value="较差" name="teacherHealth" v-model="teacherSearchInfo.teacherHealth">较差
+      </div>
+      <div class="search-button">
+        <button @click="confirmSearchTeacherInfo">查询</button>
+        <button @click="()=>{isSearch=false}">取消</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -270,7 +355,8 @@ onMounted(() => {
   translate: -50% -50%;
 }
 
-.alert-modify {
+.alert-modify,
+.alert-search {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,12 +370,14 @@ onMounted(() => {
   translate: -50% -50%;
 }
 
-.modify-info {
+.modify-info,
+.search-info {
   margin-top: 20px;
   width: 300px;
 }
 
-.modify-button {
+.modify-button,
+.search-button {
   display: flex;
   justify-content: space-evenly;
   width: 200px;
@@ -335,7 +423,6 @@ onMounted(() => {
 }
 
 .refresh-icon {
-  margin-top: 10px;
   transform: rotate(-180deg);
   transition: 2s;
 }
