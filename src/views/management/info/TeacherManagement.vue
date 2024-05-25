@@ -3,7 +3,7 @@ import {onMounted, reactive, ref, watch} from "vue";
 import {TeacherInfoArr, TeacherInfoInter} from "@/types";
 import apiInstance from "@/hooks/apiInstance";
 import {errorNotification, successNotification} from "@/hooks/notification";
-import {Refresh, Search} from "@element-plus/icons-vue";
+import ManagementBottom from "@/components/ManagementBottom.vue";
 
 let manCount = ref(0)
 let womanCount = ref(0)
@@ -51,7 +51,6 @@ function modifyTeacherInfo(index: number) {
 function deleteTeacherInfo(index: number) {
   isDelete.value = true
   teacherInfoDeleteIndex = index + (page.current - 1) * page.info
-  getTeacherInfo()
 }
 
 function confirmModifyTeacher() {
@@ -111,7 +110,6 @@ async function refreshInfo() {
 }
 
 watch(teacherInfo, () => {
-  console.log(teacherInfo.value.length)
   page.max = Math.ceil(teacherInfo.value.length / page.info)
   if (page.current > page.max) {
     page.current = 1
@@ -169,14 +167,7 @@ onMounted(() => {
         </span>
       </div>
     </div>
-    <div style="margin: 10px 0;cursor: pointer;">
-      <el-icon size="40px" style="margin: 0 10px" @click="searchTeacherInfo">
-        <Search/>
-      </el-icon>
-      <el-icon size="40px" class="refresh-icon" @click="refreshInfo" style="margin: 0 10px">
-        <Refresh/>
-      </el-icon>
-    </div>
+    <ManagementBottom :searchFunction="searchTeacherInfo" :refreshFunction="refreshInfo"/>
   </div>
 
   <!-- 修改界面 -->
@@ -420,15 +411,5 @@ onMounted(() => {
   margin-right: 10px;
   height: 30px;
   width: 50px;
-}
-
-.refresh-icon {
-  transform: rotate(-180deg);
-  transition: 2s;
-}
-
-.refresh-icon:hover {
-  transform: rotate(180deg);
-  transition: 2s;
 }
 </style>
