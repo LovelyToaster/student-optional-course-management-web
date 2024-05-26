@@ -33,3 +33,14 @@ export interface TeacherInfoInter {
 }
 
 export type TeacherInfoArr = Array<TeacherInfoInter>
+
+export interface StudentInfoInter {
+    studentNo: string,
+    studentName: string,
+    studentSex: string,
+    studentAge: number,
+    studentFaculties: string,
+    studentClass: string,
+}
+
+export type StudentInfoArr = Array<StudentInfoInter>

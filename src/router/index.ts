@@ -4,7 +4,8 @@ import Login from "../views/Login.vue";
 import Home from "../views/management/Home.vue";
 import apiInstance from "../hooks/apiInstance";
 import {useLoginStore} from "../store/login";
-import teacherManagement from "../views/management/info/TeacherManagement.vue";
+import TeacherManagement from "../views/management/info/TeacherManagement.vue";
+import StudentManagement from "../views/management/info/StudentManagement.vue";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
@@ -51,7 +52,15 @@ const router = createRouter({
                         {
                             path: "teacherManagement",
                             name: "teacherManagement",
-                            component: teacherManagement,
+                            component: TeacherManagement,
+                            meta: {
+                                isVerify: true
+                            }
+                        },
+                        {
+                            path: "studentManagement",
+                            name: "studentManagement",
+                            component: StudentManagement,
                             meta: {
                                 isVerify: true
                             }
