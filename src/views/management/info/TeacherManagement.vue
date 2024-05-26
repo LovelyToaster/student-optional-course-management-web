@@ -8,8 +8,8 @@ import ManagementBottom from "@/components/ManagementBottom.vue";
 let manCount = ref(0)
 let womanCount = ref(0)
 let totalCount = ref(0)
-let teacherInfo = ref<TeacherInfoArr>([])
-let teacherSearchInfoStep = {
+let info = ref<TeacherInfoArr>([])
+let searchInfoStep = {
   teacherNo: undefined,
   teacherName: undefined,
   teacherSex: undefined,
@@ -19,89 +19,89 @@ let teacherSearchInfoStep = {
   teacherGraduateInstitutions: undefined,
   teacherHealth: undefined,
 }
-let teacherSearchInfo = reactive<TeacherInfoInter>({...teacherSearchInfoStep})
+let searchInfo = reactive<TeacherInfoInter>({...searchInfoStep})
 let isModify = ref(false)
 let isDelete = ref(false)
 let isSearch = ref(false)
 let isRefresh = false
-let teacherInfoModifyIndex = 0
-let teacherInfoDeleteIndex = 0
+let modifyIndex = 0
+let deleteIndex = 0
 let page = reactive({
   current: 1,
   max: 1,
   info: 8
 })
 
-async function getTeacherInfo() {
+async function getInfo() {
   await apiInstance.get("/teacher/all")
       .then((resp) => {
         manCount.value = resp.data.manCount
         womanCount.value = resp.data.womanCount
         totalCount.value = resp.data.totalCount
-        teacherInfo.value = resp.data.data
+        info.value = resp.data.data
         isRefresh = true
       })
 }
 
-function modifyTeacherInfo(index: number) {
+function clickModifyInfo(index: number) {
   isModify.value = true
-  teacherInfoModifyIndex = index + (page.current - 1) * page.info
+  modifyIndex = index + (page.current - 1) * page.info
 }
 
-function deleteTeacherInfo(index: number) {
+function clickDeleteInfo(index: number) {
   isDelete.value = true
-  teacherInfoDeleteIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (page.current - 1) * page.info
 }
 
-function confirmModifyTeacher() {
+function confirmModify() {
   isModify.value = false
-  apiInstance.post("/teacher/modify", teacherInfo.value[teacherInfoModifyIndex])
+  apiInstance.post("/teacher/modify", info.value[modifyIndex])
       .then((resp) => {
         if (resp.data.message) {
           successNotification("信息修改成功!")
-          getTeacherInfo()
+          getInfo()
         } else {
           errorNotification("请检查信息输入是否正确")
         }
       })
 }
 
-function confirmDeleteTeacher() {
+function confirmDelete() {
   isDelete.value = false
   apiInstance.post("/teacher/delete", {
-    teacherNo: teacherInfo.value[teacherInfoDeleteIndex].teacherNo
+    teacherNo: info.value[deleteIndex].teacherNo
   })
       .then((resp) => {
         if (resp.data.message) {
           successNotification("信息修改成功!")
-          getTeacherInfo()
+          getInfo()
         } else {
           errorNotification("请检查信息输入是否正确")
         }
       })
 }
 
-function searchTeacherInfo() {
+function clickSearchInfo() {
   isSearch.value = true
 }
 
-function confirmSearchTeacherInfo() {
+function confirmSearchInfo() {
   isSearch.value = false
-  apiInstance.post("/teacher/search", teacherSearchInfo)
+  apiInstance.post("/teacher/search", searchInfo)
       .then((resp) => {
         if (resp.data.data) {
-          teacherInfo.value = resp.data.data
+          info.value = resp.data.data
           successNotification("查询成功，共" + resp.data.data.length + "条数据")
         } else {
           errorNotification("没有查到数据")
         }
-        Object.assign(teacherSearchInfo, teacherSearchInfoStep)
+        Object.assign(searchInfo, searchInfoStep)
       })
 }
 
-async function refreshInfo() {
+async function clickRefreshInfo() {
   isRefresh = false
-  await getTeacherInfo()
+  await getInfo()
   if (isRefresh) {
     successNotification("刷新成功")
   } else {
@@ -109,15 +109,15 @@ async function refreshInfo() {
   }
 }
 
-watch(teacherInfo, () => {
-  page.max = Math.ceil(teacherInfo.value.length / page.info)
+watch(info, () => {
+  page.max = Math.ceil(info.value.length / page.info)
   if (page.current > page.max) {
     page.current = 1
   }
 })
 
 onMounted(() => {
-  getTeacherInfo()
+  getInfo()
 })
 
 </script>
@@ -139,7 +139,7 @@ onMounted(() => {
           <th>健康状态</th>
           <th>管理</th>
         </tr>
-        <tr v-for="(teacher,index) in teacherInfo.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
+        <tr v-for="(teacher,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
             class="tr-hover">
           <td>{{ teacher.teacherNo }}</td>
           <td>{{ teacher.teacherName }}</td>
@@ -150,8 +150,8 @@ onMounted(() => {
           <td>{{ teacher.teacherGraduateInstitutions }}</td>
           <td>{{ teacher.teacherHealth }}</td>
           <td>
-            <button @click="modifyTeacherInfo(index)">修改</button>
-            <button @click="deleteTeacherInfo(index)">删除</button>
+            <button @click="clickModifyInfo(index)">修改</button>
+            <button @click="clickDeleteInfo(index)">删除</button>
           </td>
         </tr>
       </table>
@@ -167,56 +167,56 @@ onMounted(() => {
         </span>
       </div>
     </div>
-    <ManagementBottom :searchFunction="searchTeacherInfo" :refreshFunction="refreshInfo"/>
+    <ManagementBottom :searchFunction="clickSearchInfo" :refreshFunction="clickRefreshInfo"/>
   </div>
 
   <!-- 修改界面 -->
   <div>
-    <div v-if="isModify" class="alert-background" @click="()=>{isModify=false;getTeacherInfo()}"></div>
+    <div v-if="isModify" class="alert-background" @click="()=>{isModify=false;getInfo()}"></div>
     <div v-if="isModify" class="alert-modify">
       <h2>信息修改</h2>
       <div class="modify-info">
         <span>教师编号：</span>
-        <input type="text" v-model="teacherInfo[teacherInfoModifyIndex].teacherNo" disabled>
+        <input type="text" v-model="info[modifyIndex].teacherNo" disabled>
       </div>
       <div class="modify-info">
         <span>教师姓名：</span>
-        <input type="text" v-model="teacherInfo[teacherInfoModifyIndex].teacherName">
+        <input type="text" v-model="info[modifyIndex].teacherName">
       </div>
       <div class="modify-info">
         <span>教师性别：</span>
-        <input type="radio" name="teacherSex" value="男" v-model="teacherInfo[teacherInfoModifyIndex].teacherSex"
-               :checked="teacherInfo[teacherInfoModifyIndex].teacherSex==='男'">男
-        <input type="radio" name="teacherSex" value="女" v-model="teacherInfo[teacherInfoModifyIndex].teacherSex"
-               :checked="teacherInfo[teacherInfoModifyIndex].teacherSex==='女'">女
+        <input type="radio" name="teacherSex" value="男" v-model="info[modifyIndex].teacherSex"
+               :checked="info[modifyIndex].teacherSex==='男'">男
+        <input type="radio" name="teacherSex" value="女" v-model="info[modifyIndex].teacherSex"
+               :checked="info[modifyIndex].teacherSex==='女'">女
       </div>
       <div class=" modify-info">
         <span>教师年龄：</span>
-        <input type="number" min="18" max="100" v-model="teacherInfo[teacherInfoModifyIndex].teacherAge">
+        <input type="number" min="18" max="100" v-model="info[modifyIndex].teacherAge">
       </div>
       <div class="modify-info">
         <span>教师学历：</span>
-        <input type="text" v-model="teacherInfo[teacherInfoModifyIndex].teacherDegree">
+        <input type="text" v-model="info[modifyIndex].teacherDegree">
       </div>
       <div class="modify-info">
         <span>教师工作：</span>
-        <input type="text" v-model="teacherInfo[teacherInfoModifyIndex].teacherJob">
+        <input type="text" v-model="info[modifyIndex].teacherJob">
       </div>
       <div class="modify-info">
         <span>毕业院校：</span>
-        <input type="text" v-model="teacherInfo[teacherInfoModifyIndex].teacherGraduateInstitutions">
+        <input type="text" v-model="info[modifyIndex].teacherGraduateInstitutions">
       </div>
       <div class="modify-info">
         <span>健康状况：</span>
         <input type="radio" value="良好" name="teacherHealth"
-               v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
-               :checked="teacherInfo[teacherInfoModifyIndex].teacherHealth==='良好'">良好
+               v-model="info[modifyIndex].teacherHealth"
+               :checked="info[modifyIndex].teacherHealth==='良好'">良好
         <input type="radio" value="较差" name="teacherHealth"
-               v-model="teacherInfo[teacherInfoModifyIndex].teacherHealth"
-               :checked="teacherInfo[teacherInfoModifyIndex].teacherHealth==='较差'">较差
+               v-model="info[modifyIndex].teacherHealth"
+               :checked="info[modifyIndex].teacherHealth==='较差'">较差
       </div>
       <div class="modify-button">
-        <button @click="confirmModifyTeacher">确定</button>
+        <button @click="confirmModify">确定</button>
         <button @click="()=>{isModify=false}">取消</button>
       </div>
     </div>
@@ -228,13 +228,13 @@ onMounted(() => {
     <div class="alert-delete" v-if="isDelete">
       <div class="delete-info">
         <h3>
-          您确定需要删除编号为{{ teacherInfo[teacherInfoDeleteIndex].teacherNo }},姓名为{{
-            teacherInfo[teacherInfoDeleteIndex].teacherName
+          您确定需要删除编号为{{ info[deleteIndex].teacherNo }},姓名为{{
+            info[deleteIndex].teacherName
           }}的教师吗?
         </h3>
       </div>
       <div class="delete-button">
-        <button @click="confirmDeleteTeacher">确定</button>
+        <button @click="confirmDelete">确定</button>
         <button @click="()=>{isDelete=false}">取消</button>
       </div>
     </div>
@@ -247,40 +247,40 @@ onMounted(() => {
       <h2>信息修改</h2>
       <div class="search-info">
         <span>教师编号：</span>
-        <input type="text" v-model="teacherSearchInfo.teacherNo">
+        <input type="text" v-model="searchInfo.teacherNo">
       </div>
       <div class="search-info">
         <span>教师姓名：</span>
-        <input type="text" v-model="teacherSearchInfo.teacherName">
+        <input type="text" v-model="searchInfo.teacherName">
       </div>
       <div class="search-info">
         <span>教师性别：</span>
-        <input type="radio" name="teacherSex" value="男" v-model="teacherSearchInfo.teacherSex">男
-        <input type="radio" name="teacherSex" value="女" v-model="teacherSearchInfo.teacherSex">女
+        <input type="radio" name="teacherSex" value="男" v-model="searchInfo.teacherSex">男
+        <input type="radio" name="teacherSex" value="女" v-model="searchInfo.teacherSex">女
       </div>
       <div class=" search-info">
         <span>教师年龄：</span>
-        <input type="number" min="18" max="100" v-model="teacherSearchInfo.teacherAge">
+        <input type="number" min="18" max="100" v-model="searchInfo.teacherAge">
       </div>
       <div class="search-info">
         <span>教师学历：</span>
-        <input type="text" v-model="teacherSearchInfo.teacherDegree">
+        <input type="text" v-model="searchInfo.teacherDegree">
       </div>
       <div class="search-info">
         <span>教师工作：</span>
-        <input type="text" v-model="teacherSearchInfo.teacherJob">
+        <input type="text" v-model="searchInfo.teacherJob">
       </div>
       <div class="search-info">
         <span>毕业院校：</span>
-        <input type="text" v-model="teacherSearchInfo.teacherGraduateInstitutions">
+        <input type="text" v-model="searchInfo.teacherGraduateInstitutions">
       </div>
       <div class="search-info">
         <span>健康状况：</span>
-        <input type="radio" value="良好" name="teacherHealth" v-model="teacherSearchInfo.teacherHealth">良好
-        <input type="radio" value="较差" name="teacherHealth" v-model="teacherSearchInfo.teacherHealth">较差
+        <input type="radio" value="良好" name="teacherHealth" v-model="searchInfo.teacherHealth">良好
+        <input type="radio" value="较差" name="teacherHealth" v-model="searchInfo.teacherHealth">较差
       </div>
       <div class="search-button">
-        <button @click="confirmSearchTeacherInfo">查询</button>
+        <button @click="confirmSearchInfo">查询</button>
         <button @click="()=>{isSearch=false}">取消</button>
       </div>
     </div>
