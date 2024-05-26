@@ -172,7 +172,7 @@ onMounted(() => {
 
   <!-- 修改界面 -->
   <div>
-    <div v-if="isModify" class="alert-background" @click="()=>{isModify=false}"></div>
+    <div v-if="isModify" class="alert-background" @click="()=>{isModify=false;getTeacherInfo()}"></div>
     <div v-if="isModify" class="alert-modify">
       <h2>信息修改</h2>
       <div class="modify-info">
