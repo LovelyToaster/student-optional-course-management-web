@@ -95,12 +95,12 @@ function confirmSearchInfo() {
   isSearch.value = false
   apiInstance.post("/teacher/search", searchInfo)
       .then((resp) => {
-        let searchInfo = resp.data
-        if (searchInfo.code === code.SEARCH_SUCCESS) {
-          info.value = searchInfo.data
-          successNotification(searchInfo.message)
+        let searchTemp = resp.data
+        if (searchTemp.code === code.SEARCH_SUCCESS) {
+          info.value = searchTemp.data
+          successNotification(searchTemp.message)
         } else {
-          errorNotification(searchInfo.message)
+          errorNotification(searchTemp.message)
         }
         Object.assign(searchInfo, searchInfoStep)
       })
