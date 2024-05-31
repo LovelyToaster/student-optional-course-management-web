@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref, watch} from "vue";
-import {StudentInfoArr} from "@/types";
+import {StudentInfoArr, StudentInfoInter} from "@/types";
 import {errorNotification, successNotification} from "@/hooks/notification";
 import ManagementBottom from "@/components/ManagementBottom.vue";
 import apiInstance from "@/hooks/apiInstance";
@@ -29,7 +29,7 @@ let searchInfoStep = {
   studentFaculties: undefined,
   studentClass: undefined,
 }
-let searchInfo = reactive<StudentInfoArr>({...searchInfoStep})
+let searchInfo = reactive<StudentInfoInter>({...searchInfoStep})
 
 async function getInfo() {
   await apiInstance.get("/student/all")
