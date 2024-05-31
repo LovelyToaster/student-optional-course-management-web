@@ -4,6 +4,7 @@ import {TeacherInfoArr, TeacherInfoInter} from "@/types";
 import apiInstance from "@/hooks/apiInstance";
 import {errorNotification, successNotification} from "@/hooks/notification";
 import ManagementBottom from "@/components/ManagementBottom.vue";
+import code from "@/hooks/code";
 
 let manCount = ref(0)
 let womanCount = ref(0)
@@ -35,11 +36,14 @@ let page = reactive({
 async function getInfo() {
   await apiInstance.get("/teacher/all")
       .then((resp) => {
-        manCount.value = resp.data.manCount
-        womanCount.value = resp.data.womanCount
-        totalCount.value = resp.data.totalCount
-        info.value = resp.data.data
-        isRefresh = true
+        let allInfo = resp.data
+        if (allInfo.code === code.SEARCH_SUCCESS) {
+          manCount.value = allInfo.data.manCount
+          womanCount.value = allInfo.data.womanCount
+          totalCount.value = allInfo.data.totalCount
+          info.value = allInfo.data.data
+          isRefresh = true
+        }
       })
 }
 
@@ -57,11 +61,12 @@ function confirmModify() {
   isModify.value = false
   apiInstance.post("/teacher/modify", info.value[modifyIndex])
       .then((resp) => {
-        if (resp.data.message) {
-          successNotification("信息修改成功!")
+        let modifyInfo = resp.data
+        if (modifyInfo === code.MODIFY_SUCCESS) {
+          successNotification(modifyInfo.message)
           getInfo()
         } else {
-          errorNotification("请检查信息输入是否正确")
+          errorNotification(modifyInfo.message)
         }
       })
 }
@@ -72,11 +77,12 @@ function confirmDelete() {
     teacherNo: info.value[deleteIndex].teacherNo
   })
       .then((resp) => {
-        if (resp.data.message) {
-          successNotification("信息修改成功!")
+        let deleteInfo = resp.data
+        if (deleteInfo === code.DELETE_SUCCESS) {
+          successNotification(deleteInfo.message)
           getInfo()
         } else {
-          errorNotification("请检查信息输入是否正确")
+          errorNotification(deleteInfo.message)
         }
       })
 }
@@ -89,11 +95,12 @@ function confirmSearchInfo() {
   isSearch.value = false
   apiInstance.post("/teacher/search", searchInfo)
       .then((resp) => {
-        if (resp.data.data) {
-          info.value = resp.data.data
-          successNotification("查询成功，共" + resp.data.data.length + "条数据")
+        let searchInfo = resp.data
+        if (searchInfo.code === code.SEARCH_SUCCESS) {
+          info.value = searchInfo.data
+          successNotification(searchInfo.message)
         } else {
-          errorNotification("没有查到数据")
+          errorNotification(searchInfo.message)
         }
         Object.assign(searchInfo, searchInfoStep)
       })

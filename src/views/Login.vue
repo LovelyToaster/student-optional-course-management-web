@@ -5,6 +5,7 @@ import {errorNotification} from "@/hooks/notification";
 import {useLoginStore} from "@/store/login";
 import apiInstance from "@/hooks/apiInstance";
 import router from "@/router";
+import code from "@/hooks/code";
 
 let userLoginInfo = reactive<LoginInter>({
   userName: undefined,
@@ -24,9 +25,10 @@ async function login() {
           userPassword: userLoginInfo.userPassword
         }
       }).then((resp) => {
-        if (resp.data.verify) {
-          loginStore.userLoginInfo.userName = resp.data.userName
-          loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
+        let loginInfo = resp.data
+        if (loginInfo.code === code.LOGIN_SUCCESS) {
+          loginStore.userLoginInfo.userName = loginInfo.data.userName
+          loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
           router.push({name: "home", replace: true})
         } else {
           errorNotification("用户名或密码错误")

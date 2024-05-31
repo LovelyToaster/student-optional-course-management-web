@@ -6,20 +6,22 @@ import apiInstance from "../hooks/apiInstance";
 import {useLoginStore} from "../store/login";
 import TeacherManagement from "../views/management/info/TeacherManagement.vue";
 import StudentManagement from "../views/management/info/StudentManagement.vue";
+import code from "../hooks/code";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
     let loginVerify = undefined
     await apiInstance.get("/user/login/status")
         .then((resp) => {
-            loginVerify = true
-            loginStore.userLoginInfo.userName = resp.data.userName
-            loginStore.userLoginInfo.permissions = resp.data.permissions === 1 ? "管理员" : "学生"
-        })
-        .catch((e) => {
-            if (e.response.status === 301) {
+            let loginInfo = resp.data
+            if (loginInfo.code === code.LOGIN_SUCCESS) {
+                loginVerify = true
+                loginStore.userLoginInfo.userName = loginInfo.data.userName
+                loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
+            } else {
                 loginVerify = false
             }
+
         })
     return loginVerify
 }
