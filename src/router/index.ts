@@ -7,6 +7,7 @@ import {useLoginStore} from "../store/login";
 import TeacherManagement from "../views/management/info/TeacherManagement.vue";
 import StudentManagement from "../views/management/info/StudentManagement.vue";
 import code from "../hooks/code";
+import CourseManagement from "../views/management/info/CourseManagement.vue";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
@@ -63,6 +64,14 @@ const router = createRouter({
                             path: "studentManagement",
                             name: "studentManagement",
                             component: StudentManagement,
+                            meta: {
+                                isVerify: true
+                            }
+                        },
+                        {
+                            path: "courseManagement",
+                            name: "courseManagement",
+                            component: CourseManagement,
                             meta: {
                                 isVerify: true
                             }
