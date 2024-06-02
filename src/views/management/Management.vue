@@ -10,7 +10,7 @@ let buttonInfo = reactive<ButtonInfoArr>([
     show: false,
   },
   {
-    data: "管理所有信息",
+    data: "管理信息",
     name: "info",
     show: false,
     children: [
@@ -28,7 +28,30 @@ let buttonInfo = reactive<ButtonInfoArr>([
       },
       {
         data: "管理成绩信息",
-        name: "scoreManagement"
+        name: "gradeManagement"
+      }
+    ]
+  },
+  {
+    data: "增加信息",
+    name: "add",
+    show: false,
+    children:[
+      {
+        data: "增加教师信息",
+        name: "teacherAdd"
+      },
+      {
+        data: "增加学生信息",
+        name: "studentAdd"
+      },
+      {
+        data: "增加课程信息",
+        name: "courseAdd"
+      },
+      {
+        data: "增加成绩信息",
+        name: "gradeAdd"
       }
     ]
   }
