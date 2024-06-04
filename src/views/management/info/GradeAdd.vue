@@ -1,0 +1,93 @@
+<script setup lang="ts">
+import {ref} from "vue";
+import {GradeInfoInter, StudentInfoInter} from "@/types";
+import apiInstance from "@/hooks/apiInstance";
+import code from "@/hooks/code";
+import {errorNotification, successNotification} from "@/hooks/notification";
+
+let addInfoStep = {
+  no: undefined,
+  studentNo: undefined,
+  studentName: undefined,
+  courseNo: undefined,
+  courseName: undefined,
+  grade: undefined
+}
+let addInfo = ref<GradeInfoInter>({...addInfoStep})
+
+function confirmAddInfo() {
+  apiInstance.post("/grade/add", addInfo.value)
+      .then((resp) => {
+        let addResp = resp.data
+        if (addResp.code === code.ADD_SUCCESS) {
+          successNotification(addResp.message)
+          addInfo.value = addInfoStep
+        } else {
+          errorNotification(addResp.message)
+        }
+      })
+}
+</script>
+
+<template>
+  <div class="main">
+    <h1>添加成绩信息</h1>
+    <div class="add">
+      <form action="#" @submit.prevent>
+        <div>
+          <span>学生编号：</span>
+          <input type="text" required v-model="addInfo.studentNo">
+        </div>
+        <div>
+          <span>课程编号：</span>
+          <input type="text" required v-model="addInfo.courseNo">
+        </div>
+        <div>
+          <span>课程成绩：</span>
+          <input type="number" min="0" max="100" required v-model="addInfo.grade">
+        </div>
+        <div class="add-button">
+          <input type="submit" @click="confirmAddInfo">
+          <input type="reset">
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.add {
+  margin-top: 10px;
+}
+
+.add > form {
+  margin-top: 10px;
+}
+
+.add > form > div {
+  margin-top: 10px;
+}
+
+.add > form > div > span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.add-button {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.add-button > input {
+  height: 30px;
+  width: 50px;
+}
+</style>
