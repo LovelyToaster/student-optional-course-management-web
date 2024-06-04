@@ -62,7 +62,7 @@ function confirmModify() {
         if (modifyInfo.code === code.MODIFY_SUCCESS) {
           successNotification(modifyInfo.message)
           getInfo()
-        } else {
+        } else if (modifyInfo.code === code.MODIFY_FAILED) {
           errorNotification(modifyInfo.message)
         }
       })
@@ -83,7 +83,7 @@ function confirmDelete() {
         if (deleteInfo.code === code.DELETE_SUCCESS) {
           successNotification(deleteInfo.message)
           getInfo()
-        } else {
+        } else if (deleteInfo.code === code.DELETE_FAILED) {
           errorNotification(deleteInfo.message)
         }
       })
@@ -101,7 +101,7 @@ function confirmSearchInfo() {
         if (searchTemp.code === code.SEARCH_SUCCESS) {
           info.value = searchTemp.data
           successNotification(searchTemp.message)
-        } else {
+        } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
         Object.assign(searchInfo, searchInfoStep)

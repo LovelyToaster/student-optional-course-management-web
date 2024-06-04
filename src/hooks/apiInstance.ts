@@ -1,5 +1,8 @@
 import axios from "axios";
 import {errorNotification} from "./notification";
+import code from "./code";
+
+let isUse = false
 
 const apiInstance = axios.create({
     baseURL: "http://localhost:8080"
@@ -7,15 +10,16 @@ const apiInstance = axios.create({
 apiInstance.defaults.withCredentials = true
 apiInstance.defaults.headers.common["Content-Type"] = "application/x-www-form-urlencoded"
 apiInstance.interceptors.response.use((response) => {
-    return response
-}, (error) => {
-    if (error.response.status === 301 && window.location.pathname != "/") {
-        let url = window.location.origin
-        errorNotification("Token错误或已过期,稍后会返回登录界面")
-        setTimeout(() => {
-            window.location.replace(url)
-        }, 1500)
+    if (window.location.pathname != "/" && !isUse) {
+        if (response.data.code === code.LOGIN_FAILED) {
+            errorNotification(response.data.message)
+            setTimeout(() => {
+                window.location.replace(window.location.origin)
+            }, 1000)
+            isUse = true
+        }
     }
-    return Promise.reject(error)
+    return response
 })
+
 export default apiInstance

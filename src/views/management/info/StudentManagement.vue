@@ -56,10 +56,10 @@ function confirmModify() {
   apiInstance.post("/student/modify", info.value[modifyIndex])
       .then((resp) => {
         let modifyInfo = resp.data
-        if (modifyInfo === code.MODIFY_SUCCESS) {
+        if (modifyInfo.code === code.MODIFY_SUCCESS) {
           successNotification(modifyInfo.message)
           getInfo()
-        } else {
+        } else if (modifyInfo.code === code.MODIFY_FAILED) {
           errorNotification(modifyInfo.message)
         }
       })
@@ -77,10 +77,10 @@ function confirmDelete() {
   })
       .then((resp) => {
         let deleteInfo = resp.data
-        if (deleteInfo === code.DELETE_SUCCESS) {
+        if (deleteInfo.code === code.DELETE_SUCCESS) {
           successNotification(deleteInfo.message)
           getInfo()
-        } else {
+        }  else if (deleteInfo.code === code.DELETE_FAILED) {
           errorNotification(deleteInfo.message)
         }
       })
@@ -98,7 +98,7 @@ function confirmSearchInfo() {
         if (searchTemp.code === code.SEARCH_SUCCESS) {
           info.value = searchTemp.data
           successNotification(searchTemp.message)
-        } else {
+        } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
         Object.assign(searchInfo, searchInfoStep)
