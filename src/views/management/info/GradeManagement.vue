@@ -80,7 +80,7 @@ function confirmModify() {
 
 function clickDeleteInfo(index: number) {
   isDelete.value = true
-  modifyIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (page.current - 1) * page.info
 }
 
 function confirmDelete() {

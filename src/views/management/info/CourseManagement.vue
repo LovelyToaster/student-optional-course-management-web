@@ -70,7 +70,7 @@ function confirmModify() {
 
 function clickDeleteInfo(index: number) {
   isDelete.value = true
-  modifyIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (page.current - 1) * page.info
 }
 
 function confirmDelete() {
@@ -203,7 +203,7 @@ onMounted(() => {
         <h3>
           您确定需要删除课程编号为{{ info[deleteIndex].courseNo }},课程名称为{{
             info[deleteIndex].courseName
-          }}的教师吗?
+          }}的课程吗?
         </h3>
       </div>
       <div class="delete-button">
