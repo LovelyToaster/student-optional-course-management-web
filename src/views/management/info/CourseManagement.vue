@@ -22,7 +22,8 @@ let page = reactive({
 let searchInfoStep = {
   courseNo: undefined,
   courseName: undefined,
-  courseTeacher: undefined
+  teacherNo: undefined,
+  teacherName: undefined,
 }
 let searchInfo = reactive<CourseInfoInter>({...searchInfoStep})
 let teacherName = ref([])
@@ -139,14 +140,16 @@ onMounted(() => {
         <tr>
           <th>课程编号</th>
           <th>课程名称</th>
-          <th>任课教师</th>
+          <th>教师编号</th>
+          <th>教师名称</th>
           <th>管理</th>
         </tr>
         <tr v-for="(course,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
             class="tr-hover">
           <td>{{ course.courseNo }}</td>
           <td>{{ course.courseName }}</td>
-          <td>{{ course.courseTeacher }}</td>
+          <td>{{ course.teacherNo }}</td>
+          <td>{{ course.teacherName }}</td>
           <td>
             <button @click="clickModifyInfo(index)">修改</button>
             <button @click="clickDeleteInfo(index)">删除</button>
@@ -182,10 +185,8 @@ onMounted(() => {
         <input type="text" v-model="info[modifyIndex].courseName">
       </div>
       <div class=" modify-info">
-        <span>任课教师：</span>
-        <select name="" id="" v-model="info[modifyIndex].courseTeacher">
-          <option v-for="(data,index) in teacherName" :key="index" :value="data">{{ data }}</option>
-        </select>
+        <span>教师编号：</span>
+        <input type="text" v-model="info[modifyIndex].teacherNo">
       </div>
       <div class="modify-button">
         <button @click="confirmModify">确定</button>
@@ -225,9 +226,13 @@ onMounted(() => {
         <span>课程名称：</span>
         <input type="text" v-model="searchInfo.courseName">
       </div>
+      <div class="search-info">
+        <span>教师编号：</span>
+        <input type="text" v-model="searchInfo.teacherNo">
+      </div>
       <div class=" search-info">
-        <span>任课教师：</span>
-        <select name="" id="" v-model="searchInfo.courseTeacher">
+        <span>教师名称：</span>
+        <select name="" id="" v-model="searchInfo.teacherName">
           <option v-for="(data,index) in teacherName" :key="index" :value="data">{{ data }}</option>
         </select>
       </div>
