@@ -12,6 +12,7 @@ import GradeManagement from "../views/management/info/GradeManagement.vue";
 import TeacherAdd from "../views/management/info/TeacherAdd.vue";
 import StudentAdd from "../views/management/info/StudentAdd.vue";
 import GradeAdd from "../views/management/info/GradeAdd.vue";
+import CourseAdd from "../views/management/info/CourseAdd.vue";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
@@ -100,6 +101,14 @@ const router = createRouter({
                             path: "studentAdd",
                             name: "studentAdd",
                             component: StudentAdd,
+                            meta: {
+                                isVerify: true
+                            }
+                        },
+                        {
+                            path: "courseAdd",
+                            name: "courseAdd",
+                            component: CourseAdd,
                             meta: {
                                 isVerify: true
                             }
