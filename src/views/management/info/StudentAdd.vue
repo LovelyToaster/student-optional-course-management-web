@@ -65,38 +65,5 @@ function confirmAddInfo() {
 </template>
 
 <style scoped>
-.main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.add {
-  margin-top: 10px;
-}
-
-.add > form {
-  margin-top: 10px;
-}
-
-.add > form > div {
-  margin-top: 10px;
-}
-
-.add > form > div > span {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.add-button {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: 20px;
-}
-
-.add-button > input {
-  height: 30px;
-  width: 50px;
-}
+@import './css/add.css';
 </style>
