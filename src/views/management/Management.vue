@@ -2,6 +2,7 @@
 import {ButtonInfoArr} from "@/types";
 import router from "@/router";
 import {reactive, ref} from "vue";
+import {useLoginStore} from "@/store/login";
 
 let buttonInfo = reactive<ButtonInfoArr>([
   {
@@ -36,7 +37,7 @@ let buttonInfo = reactive<ButtonInfoArr>([
     data: "增加信息",
     name: "add",
     show: false,
-    children:[
+    children: [
       {
         data: "增加教师信息",
         name: "teacherAdd"
@@ -54,9 +55,15 @@ let buttonInfo = reactive<ButtonInfoArr>([
         name: "gradeAdd"
       }
     ]
+  },
+  {
+    data: "个人中心",
+    name: "user",
+    show: false
   }
 ])
 let viewArray = reactive(["首页"])
+let loginStore = useLoginStore()
 
 router.push({name: "home"})
 
@@ -85,7 +92,7 @@ function getViews(name: string, index: number, childrenData?: string) {//没有�
   <div class="background">
     <div class="header">
       <span>学生选课管理系统</span>
-      <el-avatar src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
+      <el-avatar :src="loginStore.userLoginInfo.avatarPath"></el-avatar>
     </div>
     <div class="sidebar">
       <div class="sidebar-title">功能菜单</div>

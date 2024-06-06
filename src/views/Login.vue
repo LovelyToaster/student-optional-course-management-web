@@ -29,6 +29,7 @@ async function login() {
         if (loginInfo.code === code.LOGIN_SUCCESS) {
           loginStore.userLoginInfo.userName = loginInfo.data.userName
           loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
+          loginStore.userLoginInfo.avatarPath = loginInfo.data.avatarPath + "?" + Date.now()
           router.push({name: "home", replace: true})
         } else {
           errorNotification("用户名或密码错误")

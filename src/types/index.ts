@@ -1,8 +1,16 @@
 //登录信息接口
 export interface LoginInter {
     userName: string,
-    userPassword?: string
-    permissions?: string
+    userPassword?: string,
+    permissions?: string,
+    avatarPath?: string
+}
+
+//密码重置接口
+export interface SetPasswordInter {
+    userName: string,
+    userPassword: string,
+    newPassword: string,
 }
 
 //按钮接口

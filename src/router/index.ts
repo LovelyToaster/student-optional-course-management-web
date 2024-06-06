@@ -13,17 +13,19 @@ import TeacherAdd from "../views/management/info/TeacherAdd.vue";
 import StudentAdd from "../views/management/info/StudentAdd.vue";
 import GradeAdd from "../views/management/info/GradeAdd.vue";
 import CourseAdd from "../views/management/info/CourseAdd.vue";
+import User from "../views/management/User.vue";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
     let loginVerify = undefined
-    await apiInstance.get("/user/login/status")
+    await apiInstance.get("/user/status")
         .then((resp) => {
             let loginInfo = resp.data
             if (loginInfo.code === code.LOGIN_SUCCESS) {
                 loginVerify = true
                 loginStore.userLoginInfo.userName = loginInfo.data.userName
                 loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
+                loginStore.userLoginInfo.avatarPath = loginInfo.data.avatarPath + "?" + Date.now()
             } else {
                 loginVerify = false
             }
@@ -122,6 +124,14 @@ const router = createRouter({
                             }
                         }
                     ]
+                },
+                {
+                    path: "user",
+                    name: "user",
+                    component: User,
+                    meta: {
+                        isVerify: true
+                    }
                 }
             ]
         }
