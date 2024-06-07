@@ -175,7 +175,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@import './css/management.css';
+@import '@/assets/css/management.css';
 
 .tr-hover button {
   margin-left: 10px;

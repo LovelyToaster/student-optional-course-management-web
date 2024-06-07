@@ -268,5 +268,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@import './css/management.css';
+@import '@/assets/css/management.css';
 </style>

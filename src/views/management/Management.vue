@@ -4,69 +4,7 @@ import router from "@/router";
 import {reactive, ref} from "vue";
 import {useLoginStore} from "@/store/login";
 
-let buttonInfo = reactive<ButtonInfoArr>([
-  {
-    data: "首页",
-    name: "home",
-    show: false,
-  },
-  {
-    data: "管理信息",
-    name: "info",
-    show: false,
-    children: [
-      {
-        data: "管理教师信息",
-        name: "teacherManagement"
-      },
-      {
-        data: "管理学生信息",
-        name: "studentManagement"
-      },
-      {
-        data: "管理课程信息",
-        name: "courseManagement"
-      },
-      {
-        data: "管理成绩信息",
-        name: "gradeManagement"
-      }
-    ]
-  },
-  {
-    data: "增加信息",
-    name: "add",
-    show: false,
-    children: [
-      {
-        data: "增加教师信息",
-        name: "teacherAdd"
-      },
-      {
-        data: "增加学生信息",
-        name: "studentAdd"
-      },
-      {
-        data: "增加课程信息",
-        name: "courseAdd"
-      },
-      {
-        data: "增加成绩信息",
-        name: "gradeAdd"
-      }
-    ]
-  },
-  {
-    data: "用户管理",
-    name: "allUserManagement",
-    show: false
-  },
-  {
-    data: "个人中心",
-    name: "user",
-    show: false
-  }
-])
+let buttonInfo = ref<ButtonInfoArr>()
 let viewArray = reactive(["首页"])
 let loginStore = useLoginStore()
 
@@ -75,14 +13,14 @@ router.push({name: "home"})
 //获取要访问页面的信息，同时跳转
 function getViews(name: string, index: number, childrenData?: string) {//没有孩子信息的导航栏
   if (childrenData === undefined)
-    buttonInfo[index].show = !buttonInfo[index].show
-  if (buttonInfo[index].children === undefined) {
+    buttonInfo.value[index].show = !buttonInfo.value[index].show
+  if (buttonInfo.value[index].children === undefined) {
     if (index === 0) {
       viewArray.length = 0
     } else if (viewArray.length != 1) {
       viewArray.length = 1
     }
-    viewArray.push(buttonInfo[index].data)
+    viewArray.push(buttonInfo.value[index].data)
     router.push({name: name})
   }
   if (childrenData != undefined) {
@@ -91,6 +29,104 @@ function getViews(name: string, index: number, childrenData?: string) {//没有�
     router.push({name: name})
   }
 }
+
+function selectPermissions() {
+  if (loginStore.userLoginInfo.permissions === "管理员") {
+    buttonInfo.value = [
+      {
+        data: "首页",
+        name: "home",
+        show: false,
+      },
+      {
+        data: "管理信息",
+        name: "info",
+        show: false,
+        children: [
+          {
+            data: "管理教师信息",
+            name: "teacherManagement"
+          },
+          {
+            data: "管理学生信息",
+            name: "studentManagement"
+          },
+          {
+            data: "管理课程信息",
+            name: "courseManagement"
+          },
+          {
+            data: "管理成绩信息",
+            name: "gradeManagement"
+          }
+        ]
+      },
+      {
+        data: "增加信息",
+        name: "add",
+        show: false,
+        children: [
+          {
+            data: "增加教师信息",
+            name: "teacherAdd"
+          },
+          {
+            data: "增加学生信息",
+            name: "studentAdd"
+          },
+          {
+            data: "增加课程信息",
+            name: "courseAdd"
+          },
+          {
+            data: "增加成绩信息",
+            name: "gradeAdd"
+          }
+        ]
+      },
+      {
+        data: "用户管理",
+        name: "allUserManagement",
+        show: false
+      },
+      {
+        data: "个人中心",
+        name: "user",
+        show: false
+      }
+    ]
+  } else {
+    buttonInfo.value = [
+      {
+        data: "首页",
+        name: "home",
+        show: false,
+      },
+      {
+        data: "选课管理",
+        name: "studentInfo",
+        show: false,
+        children: [
+          {
+            data: "查看个人成绩",
+            name: "studentGradeSearch"
+          },
+          {
+            data: "管理所选课程",
+            name: "studentCourseManagement"
+          },
+        ]
+      },
+      {
+        data: "个人中心",
+        name: "user",
+        show: false
+      }
+    ]
+  }
+}
+
+selectPermissions()
 </script>
 
 <template>

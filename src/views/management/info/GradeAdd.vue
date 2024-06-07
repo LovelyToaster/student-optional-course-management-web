@@ -56,5 +56,5 @@ function confirmAddInfo() {
 </template>
 
 <style scoped>
-@import './css/add.css';
+@import '@/assets/css/management.css';
 </style>
