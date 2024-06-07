@@ -2,9 +2,11 @@
 export interface LoginInter {
     userName: string,
     userPassword?: string,
-    permissions?: string,
+    permissions?: string | number,
     avatarPath?: string
 }
+
+export type LoginInfoArr = Array<LoginInter>
 
 //密码重置接口
 export interface SetPasswordInter {

@@ -57,6 +57,11 @@ let buttonInfo = reactive<ButtonInfoArr>([
     ]
   },
   {
+    data: "用户管理",
+    name: "allUserManagement",
+    show: false
+  },
+  {
     data: "个人中心",
     name: "user",
     show: false

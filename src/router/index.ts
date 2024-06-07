@@ -14,6 +14,7 @@ import StudentAdd from "../views/management/info/StudentAdd.vue";
 import GradeAdd from "../views/management/info/GradeAdd.vue";
 import CourseAdd from "../views/management/info/CourseAdd.vue";
 import User from "../views/management/User.vue";
+import AllUserManagement from "../views/management/info/AllUserManagement.vue";
 
 async function loginStatus() {
     let loginStore = useLoginStore()
@@ -122,6 +123,15 @@ const router = createRouter({
                             meta: {
                                 isVerify: true
                             }
+                        },
+                        {
+                            path: "allUserManagement",
+                            name: "allUserManagement",
+                            component: AllUserManagement,
+                            meta: {
+                                isVerify: true
+                            }
+
                         }
                     ]
                 },
