@@ -103,19 +103,14 @@ function selectPermissions() {
         show: false,
       },
       {
-        data: "选课管理",
-        name: "studentInfo",
-        show: false,
-        children: [
-          {
-            data: "查看个人成绩",
-            name: "studentGradeSearch"
-          },
-          {
-            data: "管理所选课程",
-            name: "studentCourseManagement"
-          },
-        ]
+        data: "管理选课信息",
+        name: "studentCourseManagement",
+        show: false
+      },
+      {
+        data: "添加课程",
+        name: "studentCourseAdd",
+        show: false
       },
       {
         data: "个人中心",

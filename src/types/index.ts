@@ -60,6 +60,7 @@ export interface CourseInfoInter {
     courseName: string,
     teacherNo: string,
     teacherName: string,
+    isSelect?: boolean
 }
 
 export type CourseInfoArr = Array<CourseInfoInter>
@@ -70,7 +71,7 @@ export interface GradeInfoInter {
     studentName: string,
     courseNo: string,
     courseName: string,
-    grade: string
+    grade: number
 }
 
 export type GradeInfoArr = Array<GradeInfoInter>
