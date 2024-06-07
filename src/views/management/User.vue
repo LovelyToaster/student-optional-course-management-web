@@ -49,6 +49,7 @@ function showAvatar() {
       currentAvatar.value = event.target.result
       isCrop.value = true
     }
+    upload_avatar.value.value = ""
   }
 }
 
@@ -69,7 +70,6 @@ function uploadAvatar() {
         .then((resp) => {
           let avatarInfo = resp.data
           if (avatarInfo.code === code.MODIFY_SUCCESS) {
-            console.log(avatarInfo.data)
             loginStore.userLoginInfo.avatarPath = avatarInfo.data + "?" + Date.now()
             successNotification(avatarInfo.message)
           } else if (avatarInfo.code === code.MODIFY_FAILED) {
