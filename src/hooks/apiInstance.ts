@@ -22,6 +22,9 @@ apiInstance.interceptors.response.use((response) => {
     if (response.data.code === code.SERVICE_FAILED) {
         errorNotification(response.data.message + response.data.data)
     }
+    if (response.data.code === code.PERMISSIONS_FAILED) {
+        errorNotification(response.data.message)
+    }
     return response
 })
 

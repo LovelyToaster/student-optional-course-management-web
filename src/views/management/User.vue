@@ -62,7 +62,15 @@ function uploadAvatar() {
   cropper.value.getCropBlob((data: any) => {
     let param = new FormData(); //创建form对象
     param.append('file', data);//通过append向form对象添加数据
-    apiInstance.post("/user/setAvatar", param, {
+    let upload: any
+    if (loginStore.userLoginInfo.permissions === "管理员")
+      upload = param
+    else
+      upload = {
+        file: data,
+        studentNo: loginStore.userLoginInfo.userName
+      }
+    apiInstance.post("/user/setAvatar", upload, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
