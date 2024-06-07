@@ -19,6 +19,9 @@ apiInstance.interceptors.response.use((response) => {
             isUse = true
         }
     }
+    if (response.data.code === code.SERVICE_FAILED) {
+        errorNotification(response.data.message + response.data.data)
+    }
     return response
 })
 
