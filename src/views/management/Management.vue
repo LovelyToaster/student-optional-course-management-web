@@ -3,6 +3,10 @@ import {ButtonInfoArr} from "@/types";
 import router from "@/router";
 import {reactive, ref} from "vue";
 import {useLoginStore} from "@/store/login";
+import {CloseBold} from "@element-plus/icons-vue";
+import apiInstance from "@/hooks/apiInstance";
+import code from "@/hooks/code";
+import {successNotification} from "@/hooks/notification";
 
 let buttonInfo = ref<ButtonInfoArr>()
 let viewArray = reactive(["首页"])
@@ -121,6 +125,17 @@ function selectPermissions() {
   }
 }
 
+function loginOut() {
+  apiInstance.get("/user/loginOut")
+      .then((resp) => {
+        let loginOutInfo = resp.data
+        if (loginOutInfo.code === code.LOGIN_OUT_SUCCESS) {
+          successNotification(loginOutInfo.message)
+          router.push({name: "login"})
+        }
+      })
+}
+
 selectPermissions()
 </script>
 
@@ -128,7 +143,15 @@ selectPermissions()
   <div class="background">
     <div class="header">
       <span>学生选课管理系统</span>
-      <el-avatar :src="loginStore.userLoginInfo.avatarPath"></el-avatar>
+      <div class="user-info" @click="loginOut">
+        <el-avatar :src="loginStore.userLoginInfo.avatarPath"></el-avatar>
+        <div>
+          <el-icon color="white" size="20">
+            <CloseBold/>
+          </el-icon>
+          <span>退出登录</span>
+        </div>
+      </div>
     </div>
     <div class="sidebar">
       <div class="sidebar-title">功能菜单</div>
@@ -181,9 +204,27 @@ selectPermissions()
 
 .header > span {
   margin-left: 15px;
-  margin-right: 15px;
   font-size: 20px;
   color: aliceblue;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.user-info > .el-avatar {
+  margin-right: 15px;
+}
+
+.user-info > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
 }
 
 .sidebar {

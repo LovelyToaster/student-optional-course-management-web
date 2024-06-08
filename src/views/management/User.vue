@@ -8,6 +8,7 @@ import {errorNotification, successNotification} from "@/hooks/notification";
 import code from "@/hooks/code";
 import 'vue-cropper/dist/index.css';
 import {VueCropper} from "vue-cropper";
+import router from "@/router";
 
 let loginStore = useLoginStore()
 let newPasswordAgain = ref()
@@ -31,6 +32,7 @@ function confirmSetPassword() {
           let setPasswordInfo = resp.data
           if (setPasswordInfo.code === code.MODIFY_SUCCESS) {
             successNotification(setPasswordInfo.message)
+            router.push({name: "login"})
           } else if (setPasswordInfo.code === code.MODIFY_FAILED) {
             errorNotification(setPasswordInfo.message)
           }
