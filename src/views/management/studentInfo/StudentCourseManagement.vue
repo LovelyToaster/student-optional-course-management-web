@@ -81,7 +81,8 @@ function clickDeleteInfo(index: number) {
 function confirmDelete() {
   isDelete.value = false
   apiInstance.post("/grade/delete", {
-    no: info.value[deleteIndex].no
+    no: info.value[deleteIndex].no,
+    studentNo: info.value[deleteIndex].studentNo
   })
       .then((resp) => {
         let deleteTemp = resp.data
