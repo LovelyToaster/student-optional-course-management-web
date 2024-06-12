@@ -11,7 +11,6 @@ import CourseManagement from "../views/management/info/CourseManagement.vue";
 import GradeManagement from "../views/management/info/GradeManagement.vue";
 import TeacherAdd from "../views/management/info/TeacherAdd.vue";
 import StudentAdd from "../views/management/info/StudentAdd.vue";
-import GradeAdd from "../views/management/info/GradeAdd.vue";
 import CourseAdd from "../views/management/info/CourseAdd.vue";
 import User from "../views/management/User.vue";
 import AllUserManagement from "../views/management/info/AllUserManagement.vue";
@@ -114,14 +113,6 @@ const router = createRouter({
                             path: "courseAdd",
                             name: "courseAdd",
                             component: CourseAdd,
-                            meta: {
-                                isVerify: true
-                            }
-                        },
-                        {
-                            path: "gradeAdd",
-                            name: "gradeAdd",
-                            component: GradeAdd,
                             meta: {
                                 isVerify: true
                             }

@@ -81,10 +81,6 @@ function selectPermissions() {
           {
             data: "增加课程信息",
             name: "courseAdd"
-          },
-          {
-            data: "增加成绩信息",
-            name: "gradeAdd"
           }
         ]
       },
