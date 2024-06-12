@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {reactive} from "vue";
 import {LoginInter} from "@/types"
-import {errorNotification} from "@/hooks/notification";
+import {errorNotification, loadingNotification, successNotification} from "@/hooks/notification";
 import {useLoginStore} from "@/store/login";
 import apiInstance from "@/hooks/apiInstance";
 import router from "@/router";
@@ -19,6 +19,7 @@ let loginStore = useLoginStore()
 async function login() {
   if (patternName.test(userLoginInfo.userName) && userLoginInfo.userName) {
     if (patternPassword.test(userLoginInfo.userPassword) && userLoginInfo.userPassword) {
+      let loading = loadingNotification()
       await apiInstance.get("/user/login", {
         params: {
           userName: userLoginInfo.userName,
@@ -31,8 +32,11 @@ async function login() {
           loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
           loginStore.userLoginInfo.avatarPath = loginInfo.data.avatarPath + "?" + Date.now()
           router.push({name: "home", replace: true})
-        } else {
-          errorNotification("用户名或密码错误")
+          loading.close()
+          successNotification(loginInfo.message)
+        } else if (loginInfo.code === code.LOGIN_FAILED) {
+          loading.close()
+          errorNotification(loginInfo.message)
         }
       })
     } else {
