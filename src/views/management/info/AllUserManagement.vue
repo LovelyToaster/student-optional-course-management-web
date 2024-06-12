@@ -13,7 +13,7 @@ let info = ref<LoginInfoArr>([])
 let page = reactive({
   current: 1,
   max: 1,
-  info: 8
+  info: 5
 })
 let searchInfoStep = {
   userName: undefined,
