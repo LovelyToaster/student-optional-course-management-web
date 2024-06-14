@@ -32,5 +32,8 @@ export function loadingNotification() {
             errorNotification("出现异常，请刷新重试")
         }
     }, 1000)
-    return loading
+    return {
+        loading,
+        stopInterval
+    }
 }

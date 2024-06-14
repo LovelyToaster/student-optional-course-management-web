@@ -19,7 +19,9 @@ let loginStore = useLoginStore()
 async function login() {
   if (patternName.test(userLoginInfo.userName) && userLoginInfo.userName) {
     if (patternPassword.test(userLoginInfo.userPassword) && userLoginInfo.userPassword) {
-      let loading = loadingNotification()
+      let loadingInstance = loadingNotification()
+      let loading = loadingInstance.loading
+      let stopInterval = loadingInstance.stopInterval
       await apiInstance.get("/user/login", {
         params: {
           userName: userLoginInfo.userName,
@@ -32,9 +34,11 @@ async function login() {
           loginStore.userLoginInfo.permissions = loginInfo.data.permissions === 1 ? "管理员" : "学生"
           loginStore.userLoginInfo.avatarPath = loginInfo.data.avatarPath + "?" + Date.now()
           router.push({name: "home", replace: true})
+          clearInterval(stopInterval)
           loading.close()
           successNotification(loginInfo.message)
         } else if (loginInfo.code === code.LOGIN_FAILED) {
+          clearInterval(stopInterval)
           loading.close()
           errorNotification(loginInfo.message)
         }
