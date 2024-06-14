@@ -22,23 +22,28 @@ let cropAvatar = ref(loginStore.userLoginInfo.avatarPath)
 let upload_avatar = ref()
 let isCrop = ref()
 let cropper = ref()
-
+let patternSetPassword = /^[a-z0-9_-]{6,18}$/
+let patternNewPassword = /^[a-z0-9_-]{6,18}$/
 
 function confirmSetPassword() {
   setPassword.value.userName = loginStore.userLoginInfo.userName
-  if (setPassword.value.newPassword === newPasswordAgain.value) {
-    apiInstance.post("/user/setPassword", setPassword.value)
-        .then((resp) => {
-          let setPasswordInfo = resp.data
-          if (setPasswordInfo.code === code.MODIFY_SUCCESS) {
-            successNotification(setPasswordInfo.message)
-            router.push({name: "login"})
-          } else if (setPasswordInfo.code === code.MODIFY_FAILED) {
-            errorNotification(setPasswordInfo.message)
-          }
-        })
+  if (patternSetPassword.test(setPassword.value.userName) && setPassword.value.userName && patternNewPassword.test(newPasswordAgain.value) && newPasswordAgain.value) {
+    if (setPassword.value.newPassword === newPasswordAgain.value) {
+      apiInstance.post("/user/setPassword", setPassword.value)
+          .then((resp) => {
+            let setPasswordInfo = resp.data
+            if (setPasswordInfo.code === code.MODIFY_SUCCESS) {
+              successNotification(setPasswordInfo.message)
+              router.push({name: "login"})
+            } else if (setPasswordInfo.code === code.MODIFY_FAILED) {
+              errorNotification(setPasswordInfo.message)
+            }
+          })
+    } else {
+      errorNotification("两次密码不同，请重新输入")
+    }
   } else {
-    errorNotification("两次密码不同，请重新输入")
+    errorNotification("请检查密码格式")
   }
 }
 
