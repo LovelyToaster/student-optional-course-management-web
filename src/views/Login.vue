@@ -22,11 +22,9 @@ async function login() {
       let loadingInstance = loadingNotification()
       let loading = loadingInstance.loading
       let stopInterval = loadingInstance.stopInterval
-      await apiInstance.get("/user/login", {
-        params: {
-          userName: userLoginInfo.userName,
-          userPassword: userLoginInfo.userPassword
-        }
+      await apiInstance.post("/user/login", {
+        userName: userLoginInfo.userName,
+        userPassword: userLoginInfo.userPassword
       }).then((resp) => {
         let loginInfo = resp.data
         if (loginInfo.code === code.LOGIN_SUCCESS) {
