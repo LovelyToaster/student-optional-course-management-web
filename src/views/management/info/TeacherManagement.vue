@@ -5,6 +5,7 @@ import apiInstance from "@/hooks/apiInstance";
 import {errorNotification, successNotification} from "@/hooks/notification";
 import ManagementBottom from "@/components/ManagementBottom.vue";
 import code from "@/hooks/code";
+import InfoTable from "@/components/InfoTable.vue";
 
 let manCount = ref(0)
 let womanCount = ref(0)
@@ -27,11 +28,16 @@ let isSearch = ref(false)
 let isRefresh = false
 let modifyIndex = 0
 let deleteIndex = 0
-let page = reactive({
-  current: 1,
-  max: 1,
-  info: 8
-})
+let titleMessage = ["教师编号", "教师姓名", "教师性别", "教师年龄", "教师学历", "教师工作", "毕业院校", "健康状态", "管理"]
+let data = ref([])
+let infoTable = ref()
+
+function getData() {
+  data.value.length = 0
+  for (let i = 0; i < info.value.length; i++) {
+    data.value.push([info.value[i].teacherNo, info.value[i].teacherName, info.value[i].teacherSex, info.value[i].teacherAge, info.value[i].teacherDegree, info.value[i].teacherJob, info.value[i].teacherGraduateInstitutions, info.value[i].teacherHealth])
+  }
+}
 
 async function getInfo() {
   await apiInstance.get("/teacher/all")
@@ -49,12 +55,12 @@ async function getInfo() {
 
 function clickModifyInfo(index: number) {
   isModify.value = true
-  modifyIndex = index + (page.current - 1) * page.info
+  modifyIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function clickDeleteInfo(index: number) {
   isDelete.value = true
-  deleteIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmModify() {
@@ -92,6 +98,7 @@ function clickSearchInfo() {
 }
 
 function confirmSearchInfo() {
+  infoTable.value.isLoading = true
   isSearch.value = false
   apiInstance.post("/teacher/search", searchInfo)
       .then((resp) => {
@@ -102,11 +109,13 @@ function confirmSearchInfo() {
         } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
+        infoTable.value.isLoading = false
         Object.assign(searchInfo, searchInfoStep)
       })
 }
 
 async function clickRefreshInfo() {
+  infoTable.value.isLoading = true
   isRefresh = false
   await getInfo()
   if (isRefresh) {
@@ -114,13 +123,11 @@ async function clickRefreshInfo() {
   } else {
     errorNotification("刷新失败")
   }
+  infoTable.value.isLoading = false
 }
 
 watch(info, () => {
-  page.max = Math.ceil(info.value.length / page.info)
-  if (page.current > page.max) {
-    page.current = 1
-  }
+  getData()
 })
 
 onMounted(() => {
@@ -133,47 +140,8 @@ onMounted(() => {
   <div class="main">
     <h1>所有教师的信息</h1>
     <h3>共：{{ totalCount }}人&nbsp;&nbsp;&nbsp;男：{{ manCount }}人&nbsp;&nbsp;&nbsp;女：{{ womanCount }}人</h3>
-    <div class="main-info">
-      <table class="main-table">
-        <tr>
-          <th>教师编号</th>
-          <th>教师姓名</th>
-          <th>教师性别</th>
-          <th>教师年龄</th>
-          <th>教师学历</th>
-          <th>教师工作</th>
-          <th>毕业院校</th>
-          <th>健康状态</th>
-          <th>管理</th>
-        </tr>
-        <tr v-for="(teacher,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
-            class="tr-hover">
-          <td>{{ teacher.teacherNo }}</td>
-          <td>{{ teacher.teacherName }}</td>
-          <td>{{ teacher.teacherSex }}</td>
-          <td>{{ teacher.teacherAge }}</td>
-          <td>{{ teacher.teacherDegree }}</td>
-          <td>{{ teacher.teacherJob }}</td>
-          <td>{{ teacher.teacherGraduateInstitutions }}</td>
-          <td>{{ teacher.teacherHealth }}</td>
-          <td>
-            <button @click="clickModifyInfo(index)">修改</button>
-            <button @click="clickDeleteInfo(index)">删除</button>
-          </td>
-        </tr>
-      </table>
-      <div class="page">
-        <span @click="page.current===1?errorNotification('已经是第一页了'):page.current--"
-              style="cursor: pointer;">上一页
-        </span>
-        <span>
-          {{ page.current }}/{{ page.max }}
-        </span>
-        <span @click="page.current===page.max?errorNotification('已经是最后一页了'):page.current++"
-              style="cursor: pointer;">下一页
-        </span>
-      </div>
-    </div>
+    <InfoTable ref="infoTable" :title-message="titleMessage" :info="data" :click-delete-info="clickDeleteInfo"
+               :click-modify-info="clickModifyInfo"/>
     <ManagementBottom :searchFunction="clickSearchInfo" :refreshFunction="clickRefreshInfo"/>
   </div>
 

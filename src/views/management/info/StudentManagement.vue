@@ -5,6 +5,7 @@ import {errorNotification, successNotification} from "@/hooks/notification";
 import ManagementBottom from "@/components/ManagementBottom.vue";
 import apiInstance from "@/hooks/apiInstance";
 import code from "@/hooks/code";
+import InfoTable from "@/components/InfoTable.vue";
 
 
 let manCount = ref(0)
@@ -17,11 +18,6 @@ let isRefresh = false
 let modifyIndex = 0
 let deleteIndex = 0
 let info = ref<StudentInfoArr>([])
-let page = reactive({
-  current: 1,
-  max: 1,
-  info: 8
-})
 let searchInfoStep = {
   studentNo: undefined,
   studentName: undefined,
@@ -31,6 +27,16 @@ let searchInfoStep = {
   studentClass: undefined,
 }
 let searchInfo = reactive<StudentInfoInter>({...searchInfoStep})
+let titleMessage = ["学生编号", "学生姓名", "学生性别", "学生年龄", "学生院系", "学生班级", "管理"]
+let data = ref([])
+let infoTable = ref()
+
+function getData() {
+  data.value.length = 0
+  for (let i = 0; i < info.value.length; i++) {
+    data.value.push([info.value[i].studentNo, info.value[i].studentName, info.value[i].studentSex, info.value[i].studentAge, info.value[i].studentFaculties, info.value[i].class])
+  }
+}
 
 async function getInfo() {
   await apiInstance.get("/student/all")
@@ -48,7 +54,7 @@ async function getInfo() {
 
 function clickModifyInfo(index: number) {
   isModify.value = true
-  deleteIndex = index + (page.current - 1) * page.info
+  modifyIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmModify() {
@@ -67,7 +73,7 @@ function confirmModify() {
 
 function clickDeleteInfo(index: number) {
   isDelete.value = true
-  deleteIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmDelete() {
@@ -91,6 +97,7 @@ function clickSearchInfo() {
 }
 
 function confirmSearchInfo() {
+  infoTable.value.isLoading = true
   isSearch.value = false
   apiInstance.post("/student/search", searchInfo)
       .then((resp) => {
@@ -101,11 +108,13 @@ function confirmSearchInfo() {
         } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
+        infoTable.value.isLoading = false
         Object.assign(searchInfo, searchInfoStep)
       })
 }
 
 async function clickRefreshInfo() {
+  infoTable.value.isLoading = true
   isRefresh = false
   await getInfo()
   if (isRefresh) {
@@ -113,13 +122,11 @@ async function clickRefreshInfo() {
   } else {
     errorNotification("刷新失败")
   }
+  infoTable.value.isLoading = false
 }
 
 watch(info, () => {
-  page.max = Math.ceil(info.value.length / page.info)
-  if (page.current > page.max) {
-    page.current = 1
-  }
+  getData()
 })
 
 onMounted(() => {
@@ -132,43 +139,8 @@ onMounted(() => {
   <div class="main">
     <h1>所有学生的信息</h1>
     <h3>共：{{ totalCount }}人&nbsp;&nbsp;&nbsp;男：{{ manCount }}人&nbsp;&nbsp;&nbsp;女：{{ womanCount }}人</h3>
-    <div class="main-info">
-      <table class="main-table">
-        <tr>
-          <th>学生编号</th>
-          <th>学生姓名</th>
-          <th>学生性别</th>
-          <th>学生年龄</th>
-          <th>学生院系</th>
-          <th>学生班级</th>
-          <th>管理</th>
-        </tr>
-        <tr v-for="(student,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
-            class="tr-hover">
-          <td>{{ student.studentNo }}</td>
-          <td>{{ student.studentName }}</td>
-          <td>{{ student.studentSex }}</td>
-          <td>{{ student.studentAge }}</td>
-          <td>{{ student.studentFaculties }}</td>
-          <td>{{ student.studentClass }}</td>
-          <td>
-            <button @click="clickModifyInfo(index)">修改</button>
-            <button @click="clickDeleteInfo(index)">删除</button>
-          </td>
-        </tr>
-      </table>
-      <div class="page">
-        <span @click="page.current===1?errorNotification('已经是第一页了'):page.current--"
-              style="cursor: pointer;">上一页
-        </span>
-        <span>
-          {{ page.current }}/{{ page.max }}
-        </span>
-        <span @click="page.current===page.max?errorNotification('已经是最后一页了'):page.current++"
-              style="cursor: pointer;">下一页
-        </span>
-      </div>
-    </div>
+    <InfoTable ref="infoTable" :title-message="titleMessage" :info="data" :click-delete-info="clickDeleteInfo"
+               :click-modify-info="clickModifyInfo"/>
     <ManagementBottom :searchFunction="clickSearchInfo" :refreshFunction="clickRefreshInfo"/>
   </div>
 

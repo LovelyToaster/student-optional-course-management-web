@@ -5,6 +5,7 @@ import {errorNotification, successNotification} from "@/hooks/notification";
 import ManagementBottom from "@/components/ManagementBottom.vue";
 import apiInstance from "@/hooks/apiInstance";
 import code from "@/hooks/code";
+import InfoTable from "@/components/InfoTable.vue";
 
 let totalCount = ref(0)
 let isModify = ref(false)
@@ -14,11 +15,6 @@ let isRefresh = false
 let modifyIndex = 0
 let deleteIndex = 0
 let info = ref<CourseInfoArr>([])
-let page = reactive({
-  current: 1,
-  max: 1,
-  info: 8
-})
 let searchInfoStep = {
   courseNo: undefined,
   courseName: undefined,
@@ -27,6 +23,16 @@ let searchInfoStep = {
 }
 let searchInfo = reactive<CourseInfoInter>({...searchInfoStep})
 let teacherName = ref([])
+let titleMessage = ["课程编号", "课程名称", "教师编号", "教师姓名", "管理"]
+let data = ref([])
+let infoTable = ref()
+
+function getData() {
+  data.value.length = 0
+  for (let i = 0; i < info.value.length; i++) {
+    data.value.push([info.value[i].courseNo, info.value[i].courseName, info.value[i].teacherNo, info.value[i].teacherName])
+  }
+}
 
 async function getInfo() {
   await apiInstance.get("/course/all")
@@ -51,7 +57,7 @@ async function getInfo() {
 
 function clickModifyInfo(index: number) {
   isModify.value = true
-  modifyIndex = index + (page.current - 1) * page.info
+  modifyIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmModify() {
@@ -70,7 +76,7 @@ function confirmModify() {
 
 function clickDeleteInfo(index: number) {
   isDelete.value = true
-  deleteIndex = index + (page.current - 1) * page.info
+  deleteIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmDelete() {
@@ -94,6 +100,7 @@ function clickSearchInfo() {
 }
 
 function confirmSearchInfo() {
+  infoTable.value.isLoading = true
   isSearch.value = false
   apiInstance.post("/course/search", searchInfo)
       .then((resp) => {
@@ -104,11 +111,13 @@ function confirmSearchInfo() {
         } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
+        infoTable.value.isLoading = false
         Object.assign(searchInfo, searchInfoStep)
       })
 }
 
 async function clickRefreshInfo() {
+  infoTable.value.isLoading = true
   isRefresh = false
   await getInfo()
   if (isRefresh) {
@@ -116,13 +125,11 @@ async function clickRefreshInfo() {
   } else {
     errorNotification("刷新失败")
   }
+  infoTable.value.isLoading = false
 }
 
 watch(info, () => {
-  page.max = Math.ceil(info.value.length / page.info)
-  if (page.current > page.max) {
-    page.current = 1
-  }
+  getData()
 })
 
 onMounted(() => {
@@ -135,39 +142,8 @@ onMounted(() => {
   <div class="main">
     <h1>所有课程的信息</h1>
     <h3>共：{{ totalCount }}个</h3>
-    <div class="main-info">
-      <table class="main-table">
-        <tr>
-          <th>课程编号</th>
-          <th>课程名称</th>
-          <th>教师编号</th>
-          <th>教师名称</th>
-          <th>管理</th>
-        </tr>
-        <tr v-for="(course,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
-            class="tr-hover">
-          <td>{{ course.courseNo }}</td>
-          <td>{{ course.courseName }}</td>
-          <td>{{ course.teacherNo }}</td>
-          <td>{{ course.teacherName }}</td>
-          <td>
-            <button @click="clickModifyInfo(index)">修改</button>
-            <button @click="clickDeleteInfo(index)">删除</button>
-          </td>
-        </tr>
-      </table>
-      <div class="page">
-        <span @click="page.current===1?errorNotification('已经是第一页了'):page.current--"
-              style="cursor: pointer;">上一页
-        </span>
-        <span>
-          {{ page.current }}/{{ page.max }}
-        </span>
-        <span @click="page.current===page.max?errorNotification('已经是最后一页了'):page.current++"
-              style="cursor: pointer;">下一页
-        </span>
-      </div>
-    </div>
+    <InfoTable ref="infoTable" :title-message="titleMessage" :info="data" :click-delete-info="clickDeleteInfo"
+               :click-modify-info="clickModifyInfo"/>
     <ManagementBottom :searchFunction="clickSearchInfo" :refreshFunction="clickRefreshInfo"/>
   </div>
 

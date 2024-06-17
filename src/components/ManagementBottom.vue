@@ -1,10 +1,10 @@
 <script setup>
 import {Refresh, Search} from "@element-plus/icons-vue";
 
-let prop = defineProps({
+defineProps({
   searchFunction: Function,
   refreshFunction: Function,
-})
+});
 </script>
 
 <template>

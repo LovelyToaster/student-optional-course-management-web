@@ -6,16 +6,12 @@ import ManagementBottom from "@/components/ManagementBottom.vue";
 import apiInstance from "@/hooks/apiInstance";
 import code from "@/hooks/code";
 import {useLoginStore} from "@/store/login";
+import InfoTable from "@/components/InfoTable.vue";
 
 let totalCount = ref(0)
 let isSearch = ref(false)
 let isRefresh = false
 let info = ref<CourseInfoArr>([])
-let page = reactive({
-  current: 1,
-  max: 1,
-  info: 8
-})
 let searchInfoStep = {
   courseNo: undefined,
   courseName: undefined,
@@ -28,6 +24,17 @@ let teacherName = ref([])
 let loginStore = useLoginStore()
 let isSelectCourse = ref(false)
 let selectIndex = 0
+let titleMessage = ["课程编号", "课程名称", "教师编号", "教师名称", "管理"]
+let data = ref([])
+let infoTable = ref()
+let isSelect = ref([])
+
+function getData() {
+  data.value.length = 0
+  for (let i = 0; i < info.value.length; i++) {
+    data.value.push([info.value[i].courseNo, info.value[i].courseName, info.value[i].teacherNo, info.value[i].teacherName])
+  }
+}
 
 async function getInfo() {
   await apiInstance.get("/course/all")
@@ -60,7 +67,7 @@ async function getInfo() {
         for (let temp of info.value) {
           searchTemp.data.find((array: CourseInfoInter) => {
             if (temp.courseNo === array.courseNo) {
-              info.value[index].isSelect = true
+              isSelect.value[index] = true
             }
           })
           index++
@@ -73,6 +80,7 @@ function clickSearchInfo() {
 }
 
 function confirmSearchInfo() {
+  infoTable.value.isLoading = true
   isSearch.value = false
   apiInstance.post("/course/search", searchInfo)
       .then((resp) => {
@@ -83,13 +91,14 @@ function confirmSearchInfo() {
         } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
+        infoTable.value.isLoading = false
         Object.assign(searchInfo, searchInfoStep)
       })
 }
 
 function clickSelectCourse(index: number) {
   isSelectCourse.value = true
-  selectIndex = index
+  selectIndex = index + (infoTable.value.page.current - 1) * infoTable.value.page.info
 }
 
 function confirmSelectCourse() {
@@ -102,7 +111,7 @@ function confirmSelectCourse() {
         let addTemp = resp.data
         if (addTemp.code === code.ADD_SUCCESS) {
           successNotification(addTemp.message)
-          info.value[selectIndex].isSelect = true
+          isSelect.value[selectIndex] = true
         } else if (addTemp.code === code.ADD_FAILED) {
           errorNotification(addTemp.message)
         }
@@ -110,6 +119,7 @@ function confirmSelectCourse() {
 }
 
 async function clickRefreshInfo() {
+  infoTable.value.isLoading = true
   isRefresh = false
   await getInfo()
   if (isRefresh) {
@@ -117,13 +127,11 @@ async function clickRefreshInfo() {
   } else {
     errorNotification("刷新失败")
   }
+  infoTable.value.isLoading = false
 }
 
 watch(info, () => {
-  page.max = Math.ceil(info.value.length / page.info)
-  if (page.current > page.max) {
-    page.current = 1
-  }
+  getData()
 })
 
 onMounted(() => {
@@ -135,39 +143,8 @@ onMounted(() => {
   <div class="main">
     <h1>所有课程信息</h1>
     <h3>共：{{ totalCount }}个</h3>
-    <div class="main-info">
-      <table class="main-table">
-        <tr>
-          <th>课程编号</th>
-          <th>课程名称</th>
-          <th>教师编号</th>
-          <th>教师名称</th>
-          <th>管理</th>
-        </tr>
-        <tr v-for="(course,index) in info.slice((page.current-1)*page.info,page.current*page.info)" :key="index"
-            class="tr-hover">
-          <td>{{ course.courseNo }}</td>
-          <td>{{ course.courseName }}</td>
-          <td>{{ course.teacherNo }}</td>
-          <td>{{ course.teacherName }}</td>
-          <td>
-            <span v-if="info[index].isSelect">已选此课</span>
-            <button v-if="!info[index].isSelect" @click="clickSelectCourse(index)">选课</button>
-          </td>
-        </tr>
-      </table>
-      <div class="page">
-        <span @click="page.current===1?errorNotification('已经是第一页了'):page.current--"
-              style="cursor: pointer;">上一页
-        </span>
-        <span>
-          {{ page.current }}/{{ page.max }}
-        </span>
-        <span @click="page.current===page.max?errorNotification('已经是最后一页了'):page.current++"
-              style="cursor: pointer;">下一页
-        </span>
-      </div>
-    </div>
+    <InfoTable ref="infoTable" :title-message="titleMessage" :info="data" :click-select-course="clickSelectCourse"
+               type="studentCourseAdd" :is-select="isSelect"/>
     <ManagementBottom :searchFunction="clickSearchInfo" :refreshFunction="clickRefreshInfo"/>
 
   </div>

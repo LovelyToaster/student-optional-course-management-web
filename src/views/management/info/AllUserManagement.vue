@@ -22,6 +22,7 @@ let searchInfoStep = {
 let searchInfo = reactive<LoginInter>({...searchInfoStep})
 let isResetPassword = ref(false)
 let resetPasswordIndex = 0
+let isLoading = ref(true)
 
 async function getInfo() {
   await apiInstance.get("/user/all")
@@ -42,6 +43,7 @@ function clickSearchInfo() {
 }
 
 function confirmSearchInfo() {
+  isLoading.value = true
   isSearch.value = false
   apiInstance.post("/user/search", searchInfo)
       .then((resp) => {
@@ -52,11 +54,13 @@ function confirmSearchInfo() {
         } else if (searchTemp.code === code.SEARCH_FAILED) {
           errorNotification(searchTemp.message)
         }
+        isLoading.value = false
         Object.assign(searchInfo, searchInfoStep)
       })
 }
 
 async function clickRefreshInfo() {
+  isLoading.value = true
   isRefresh = false
   await getInfo()
   if (isRefresh) {
@@ -64,6 +68,7 @@ async function clickRefreshInfo() {
   } else {
     errorNotification("刷新失败")
   }
+  isLoading.value = false
 }
 
 function clickResetPasswordInfo(index: number) {
@@ -85,10 +90,10 @@ function confirmResetPassword() {
 }
 
 watch(info, () => {
+  if (isLoading.value)
+    isLoading.value = false
   page.max = Math.ceil(info.value.length / page.info)
-  if (page.current > page.max) {
-    page.current = 1
-  }
+  page.current = 1
 })
 
 onMounted(() => {
@@ -101,7 +106,7 @@ onMounted(() => {
   <div class="main">
     <h1>所有用户的信息</h1>
     <h3>共：{{ totalCount }}个</h3>
-    <div class="main-info">
+    <div class="main-info" v-loading="isLoading" element-loading-background="white">
       <table class="main-table">
         <tr>
           <th>用户头像</th>
